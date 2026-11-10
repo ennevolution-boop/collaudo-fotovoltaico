@@ -1,0 +1,1229 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Il Collaudo del Fotovoltaico</title>
+<meta name="description" content="Prima di firmare, prova l’impianto: scegli la provincia, carica i preventivi in PDF, guarda l’energia scorrere tra pannelli, batteria, casa e rete in una giornata simulata. Indice di Fuffa, ritocchi e confronto. Gratis, senza registrazione.">
+<meta property="og:title" content="Il Collaudo del Fotovoltaico">
+<meta property="og:description" content="Prima di firmare, prova l’impianto.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#EEF3F7; --paper:#FFFFFF; --ink:#0E2A40; --muted:#5A6B7B; --line:#D5DFE8; --soft:#F5F8FB; --grid:#E3EBF2;
+  --sun:#FFB000; --solar:#F59E0B; --self:#17A673; --batt:#0EA5A4; --grid-in:#2D7FF9; --grid-out:#8B5CF6; --red:#D9463B;
+  --pA:#F59E0B; --pB:#2D7FF9; --pC:#17A673; --pD:#8B5CF6;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0B1722;--paper:#112232;--ink:#E7F0F7;--muted:#9DB0C1;--line:#22384B;--soft:#16293B;--grid:#18304A;--red:#FF7A6E;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B1722;--paper:#112232;--ink:#E7F0F7;--muted:#9DB0C1;--line:#22384B;--soft:#16293B;--grid:#18304A;--red:#FF7A6E;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;color:var(--ink);font-family:"IBM Plex Sans","Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.5;background:var(--bg);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--grid-in);outline-offset:2px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:1320px;margin:0 auto;padding:22px 16px 56px}
+.hero{display:grid;gap:16px;margin-bottom:18px}
+@media (min-width:900px){.hero{grid-template-columns:1.3fr 1fr;align-items:end}}
+.hero .kicker{font-family:"IBM Plex Mono",monospace;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.hero h1{font-size:clamp(2.2rem,5vw,3.8rem);line-height:1;margin:6px 0 8px;font-weight:700;letter-spacing:-.02em}
+.hero h1 span{color:var(--solar)}
+.hero p{margin:0;font-size:1.12rem;color:var(--muted);max-width:52ch}
+.fuffa{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:14px 18px;display:flex;gap:16px;align-items:center}
+.fuffa .n{font-family:"IBM Plex Mono",monospace;font-size:3.4rem;font-weight:600;line-height:1;color:var(--red)}
+.fuffa .l{font-weight:600}
+.fuffa small{display:block;color:var(--muted);font-weight:400}
+.legalnote{font-size:.86rem;color:var(--muted);background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin:0 0 18px}
+.legalnote a,.legal a{color:var(--grid-in)}
+.stale{display:block;color:var(--red);font-weight:600;margin-top:6px}.stale:empty{display:none}
+.grid{display:grid;gap:20px;grid-template-columns:1fr}
+@media (min-width:1100px){.grid{grid-template-columns:350px 1fr;align-items:start}}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:16px}
+@media (min-width:1100px){.panel{position:sticky;top:calc(14px + env(safe-area-inset-top,0px));max-height:calc(100vh - 28px);overflow:auto}}
+.panel h2{font-size:1.25rem;margin:0}
+.panel .lead{color:var(--muted);margin:4px 0 12px;font-size:.92rem}
+.levels{display:grid;grid-template-columns:1fr 1fr;background:var(--soft);border-radius:10px;padding:3px;margin-bottom:12px}
+.levels button{border:0;background:transparent;padding:7px 4px;border-radius:8px;cursor:pointer;font-weight:600}
+.levels button[aria-pressed="true"]{background:var(--paper);box-shadow:0 1px 4px rgba(14,42,64,.15)}
+fieldset{border:0;border-top:1px solid var(--line);margin:0;padding:12px 0 4px}
+legend{font-weight:700;padding:0 6px 0 0}
+legend label{display:flex;gap:8px;align-items:center;cursor:pointer}
+legend input{width:18px;height:18px;accent-color:var(--solar)}
+.chipk{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;color:#fff;font-weight:700;font-size:.8rem}
+fieldset.off .fbody{display:none}
+.f{display:grid;grid-template-columns:1fr 128px;gap:3px 10px;align-items:center;margin:8px 0}
+.f label{font-weight:500;font-size:.93rem}
+.f input,.f select{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--soft);text-align:right}
+.f select{text-align:left}
+.f small{grid-column:1/-1;color:var(--muted);font-size:.82rem;line-height:1.3}
+body.lv-rapida .xp{display:none}
+.check{display:flex;gap:8px;align-items:center;margin:8px 0;font-size:.93rem}
+.check input{width:18px;height:18px;accent-color:var(--solar)}
+.drop{border:2px dashed var(--solar);border-radius:14px;padding:12px;margin:0 0 12px;background:color-mix(in srgb,var(--sun) 8%,var(--paper));display:grid;gap:4px;cursor:pointer;text-align:center}
+.drop b{font-size:1rem}.drop span{font-size:.86rem;color:var(--muted)}
+.drop.over{background:color-mix(in srgb,var(--sun) 22%,var(--paper))}
+.lnk{color:var(--grid-in);text-decoration:underline;font-weight:600}
+.pdfmsg{font-size:.86rem;font-weight:600;margin:-4px 0 10px}.pdfmsg:empty{display:none}
+.mini{display:inline-flex;gap:6px;align-items:center;font-size:.84rem;font-weight:600;color:var(--grid-in);cursor:pointer;margin:4px 0}
+.found{font-size:.84rem;background:color-mix(in srgb,var(--grid-in) 7%,var(--paper));border-left:3px solid var(--grid-in);border-radius:8px;padding:8px 10px;margin:6px 0}
+.found:empty{display:none}.found ul{margin:4px 0 0;padding-left:1.1em}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.btn{border:1px solid var(--line);background:var(--soft);padding:9px 13px;border-radius:10px;cursor:pointer;font-weight:600}
+.btn.main{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.sun{background:var(--sun);border-color:var(--sun);color:#1b1300}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:16px 18px}
+.card h2{font-size:1.3rem;margin:0 0 8px}
+.card+.card{margin-top:20px}
+
+/* --- il viaggio --- */
+.stage-h{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.steps{display:flex;gap:4px;background:var(--soft);border-radius:12px;padding:4px;flex-wrap:wrap}
+.steps button{border:0;background:transparent;padding:7px 12px;border-radius:9px;cursor:pointer;font-weight:600;font-size:.92rem}
+.steps button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.stage{position:relative;aspect-ratio:10/7;border-radius:16px;overflow:hidden;background:var(--soft);border:1px solid var(--line)}
+.stage svg{position:absolute;inset:0;width:100%;height:100%;transition:opacity .6s ease}
+.stage .hide{opacity:0;pointer-events:none}
+.stage .cap{position:absolute;left:12px;bottom:12px;right:12px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;pointer-events:none}
+.stage .cap span{background:color-mix(in srgb,var(--paper) 88%,transparent);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:.88rem;font-weight:600}
+.mode{position:absolute;top:12px;right:12px;display:flex;background:color-mix(in srgb,var(--paper) 92%,transparent);border:1px solid var(--line);border-radius:12px;padding:3px}
+.mode button{border:0;background:transparent;padding:6px 10px;border-radius:9px;font-weight:700;cursor:pointer;font-size:.88rem}
+.mode button[aria-pressed="true"].real{background:var(--self);color:#fff}
+.mode button[aria-pressed="true"].prom{background:var(--red);color:#fff}
+.controls{display:grid;gap:10px;margin-top:12px}
+@media (min-width:760px){.controls{grid-template-columns:auto 1fr auto auto}}
+.clock{display:flex;gap:8px;align-items:center}
+.clock .t{font-family:"IBM Plex Mono",monospace;font-size:1.5rem;font-weight:600;min-width:4.2ch}
+input[type=range]{width:100%;accent-color:var(--solar)}
+.sel{display:flex;gap:6px;align-items:center;font-size:.9rem}
+.sel select{padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--soft)}
+.meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:12px}
+.meter{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.meter small{display:block;color:var(--muted);font-size:.76rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.meter b{font-family:"IBM Plex Mono",monospace;font-size:1.15rem}
+.meter i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:12px}
+.app{display:flex;gap:8px;align-items:center;justify-content:space-between;border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:8px 10px;cursor:pointer;text-align:left}
+.app .nm{font-weight:600;font-size:.9rem;line-height:1.2}
+.app .kw{font-family:"IBM Plex Mono",monospace;font-size:.78rem;color:var(--muted);display:block}
+.app .sw{width:34px;height:20px;border-radius:999px;background:var(--line);position:relative;flex:none;transition:background .2s}
+.app .sw::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s}
+.app[aria-pressed="true"]{border-color:var(--solar);background:color-mix(in srgb,var(--sun) 10%,var(--paper))}
+.app[aria-pressed="true"] .sw{background:var(--solar)}
+.app[aria-pressed="true"] .sw::after{left:17px}
+.note{font-size:.85rem;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.84rem;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:16px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle}
+
+/* --- tetto --- */
+.rooftools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.rooftools .btn[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.roofwrap{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--soft);touch-action:none}
+#roof{display:block;width:100%;height:auto;user-select:none;-webkit-user-select:none}
+.ask{position:absolute;left:50%;top:12px;transform:translateX(-50%);background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;gap:6px;align-items:center;box-shadow:0 6px 18px rgba(14,42,64,.18);font-size:.9rem}
+.ask input{width:80px;padding:6px;border:1px solid var(--line);border-radius:8px;text-align:right}
+.rose{display:grid;grid-template-columns:repeat(3,40px);gap:4px}
+.rose button{height:34px;border:1px solid var(--line);background:var(--paper);border-radius:8px;cursor:pointer;font-weight:700;font-size:.82rem}
+.rose button[aria-pressed="true"]{background:var(--solar);border-color:var(--solar);color:#1b1300}
+.rose span{display:grid;place-items:center;font-size:.7rem;color:var(--muted)}
+.compassbar{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;margin-top:10px}
+.compassbar .grp{display:grid;gap:6px}
+.compassbar .grp small{color:var(--muted);font-weight:600}
+.howto{margin:6px 0 4px}.howto summary{cursor:pointer;color:var(--grid-in);font-weight:600}
+.howto ol{margin:6px 0;padding-left:1.2em;font-size:.9rem}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}
+.opt{margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:color-mix(in srgb,var(--self) 6%,var(--paper))}
+.opt h3{margin:0 0 6px;font-size:1.05rem}
+.tips{list-style:none;padding:0;margin:8px 0 0}
+.tips li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:7px 0;border-top:1px dashed var(--line);font-size:.9rem}
+.tips li .eur{font-family:"IBM Plex Mono",monospace;color:var(--self);font-weight:600;text-align:right}
+.tips li p{grid-column:1/-1;margin:0;color:var(--muted)}
+.types{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.types button{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:8px;cursor:pointer;display:grid;gap:4px;justify-items:center;font-weight:600;font-size:.86rem}
+.types button[aria-pressed="true"]{border-color:var(--solar);box-shadow:0 0 0 2px var(--solar) inset}
+.types svg{width:84px;height:56px}
+.guide{list-style:none;padding:0;margin:10px 0;display:grid;gap:6px}
+.guide li{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--paper);font-size:.92rem;color:var(--muted)}
+.guide li b{display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:50%;background:var(--soft);color:var(--ink);font-family:"IBM Plex Mono",monospace;font-size:.8rem}
+.guide li.now{border-color:var(--solar);background:color-mix(in srgb,var(--sun) 10%,var(--paper));color:var(--ink)}
+.guide li.now b{background:var(--solar);color:#1b1300}
+.guide li.done{opacity:.6}.guide li.done b{background:var(--self);color:#fff}
+.ptools{position:absolute;z-index:3;display:flex;gap:4px;align-items:center;padding:4px;border:1px solid var(--solar);border-radius:12px;background:var(--paper);box-shadow:0 8px 20px rgba(14,42,64,.22);transform:translate(-50%,0);white-space:nowrap}
+.ptools[hidden]{display:none}
+.ptools button{border:0;background:var(--soft);border-radius:9px;padding:7px 9px;cursor:pointer;font-weight:700;font-size:.9rem;line-height:1}
+.ptools button:hover{background:color-mix(in srgb,var(--sun) 25%,var(--paper))}
+.northc{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 0;font-size:.9rem}
+.northc input[type=range]{width:170px}
+/* --- schede preventivo --- */
+.offers{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));margin-top:4px}
+.oc{border:1px solid var(--line);border-radius:16px;padding:14px;background:var(--paper);display:grid;gap:10px;align-content:start}
+.oc-h{display:flex;gap:10px;align-items:center}
+.oc-h b{font-size:1.05rem}
+.oc-h small{display:block;color:var(--muted)}
+.idx{display:flex;align-items:baseline;gap:10px}
+.idx .n{font-family:"IBM Plex Mono",monospace;font-size:2.4rem;font-weight:600;line-height:1}
+.idx .l{font-weight:600}
+.pr{display:grid;grid-template-columns:1fr auto auto;gap:2px 12px;font-size:.9rem}
+.pr span:nth-child(3n+1){color:var(--muted)}
+.pr .h{font-family:"IBM Plex Mono",monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.pr .v{font-family:"IBM Plex Mono",monospace;text-align:right}
+.pr .vp{color:var(--red)}.pr .vr{color:var(--self);font-weight:600}
+.rit{list-style:none;padding:0;margin:0}
+.rit li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:7px 0;border-top:1px dashed var(--line);font-size:.88rem}
+.rit li b{font-weight:600}
+.rit li .eur{font-family:"IBM Plex Mono",monospace;color:var(--red);text-align:right}
+.rit li p{grid-column:1/-1;margin:0;color:var(--muted)}
+.rit li.cl b::before{content:"PDF · ";font-family:"IBM Plex Mono",monospace;font-size:.75rem;color:var(--grid-in)}
+.rit li q{font-style:italic;color:var(--ink)}
+.verd{border-radius:10px;padding:8px 10px;font-weight:700;text-align:center}
+.verd.ok{background:color-mix(in srgb,var(--self) 14%,var(--paper));color:var(--self)}
+.verd.mid{background:color-mix(in srgb,var(--sun) 18%,var(--paper))}
+.verd.ko{background:color-mix(in srgb,var(--red) 12%,var(--paper));color:var(--red)}
+.scroll{overflow-x:auto}
+table.st{border-collapse:collapse;width:100%;font-size:.93rem}
+table.st th,table.st td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+table.st td{font-family:"IBM Plex Mono",monospace;font-size:.88rem}
+table.st thead th{border-bottom:2px solid var(--ink)}
+table.st th:first-child,table.st td:first-child{text-align:left;font-family:inherit}
+table.st tr.key td{font-weight:600}
+details.sec{border-top:1px solid var(--line)}
+details.sec>summary{list-style:none;cursor:pointer;padding:11px 0;display:flex;gap:10px}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary h3{font-size:1.02rem;margin:0;flex:1}
+details.sec>summary::after{content:"+";font-weight:700}
+details.sec[open]>summary::after{content:"–"}
+.body{padding:0 0 12px;max-width:84ch}
+.ev{list-style:none;padding:0;margin:0}
+.ev li{padding:7px 0;border-bottom:1px dashed var(--line)}
+.ev .k{display:inline-block;min-width:7em;font-weight:600;color:var(--muted)}
+.calc{font-size:.85rem;color:var(--muted);margin:4px 0 10px}
+.calc summary{cursor:pointer;color:var(--grid-in);font-weight:600}
+.calc pre{white-space:pre-wrap;font-family:"IBM Plex Mono",monospace;margin:6px 0 0;padding:8px 10px;background:var(--soft);border-radius:8px}
+.verdict p.v{font-size:1.5rem;font-weight:700;line-height:1.25;margin:6px 0}
+.foot{font-size:.86rem;color:var(--muted);max-width:98ch;margin-top:20px}
+.foot p{margin:.5em 0}
+.legal{background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin:0 0 14px}
+.legal h2{font-size:1.02rem;margin:0 0 6px}
+.legal ul{margin:6px 0 0;padding-left:1.2em}.legal li{margin:5px 0}
+.legal .stamp{display:inline-block;border:2px solid var(--ink);border-radius:8px;padding:3px 9px;font-weight:700;margin:2px 0 8px}
+.cta{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.cta a{background:var(--paper);border:1px solid var(--line);color:var(--ink);padding:8px 12px;border-radius:10px;text-decoration:none;font-weight:600}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;opacity:0;transition:opacity .2s;pointer-events:none;font-weight:600}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body class="lv-rapida">
+<div class="wrap">
+<header class="hero">
+  <div>
+    <div class="kicker">Banco di prova per preventivi fotovoltaici</div>
+    <h1>Il Collaudo del <span>Fotovoltaico</span></h1>
+    <p>Prima di firmare, prova l’impianto. Scegli dove abiti, carica i preventivi e guarda l’energia che produce davvero, ora per ora.</p>
+  </div>
+  <div class="fuffa" id="big"></div>
+</header>
+<p class="legalnote"><b>Strumento informativo, esemplificativo e satirico, con finalità anche ludiche.</b> Non sostituisce un tecnico abilitato, un consulente fiscale né i documenti dell’installatore: serve a capire meglio i preventivi e a fare le domande giuste prima di firmare. Le decisioni restano tue. <b>Informazioni aggiornate a ottobre 2026.</b><span class="stale" id="stale"></span> <a href="#avvertenze">Leggi le avvertenze legali</a>.</p>
+
+<div class="grid">
+<form class="panel" id="form" onsubmit="return false" aria-label="Dati della casa e dei preventivi">
+  <h2>I dati del collaudo</h2>
+  <p class="lead">Dove abiti, quanto consumi e i preventivi ricevuti.</p>
+  <div class="levels" role="group" aria-label="Livello di dettaglio">
+    <button type="button" data-lv="rapida" aria-pressed="true">Rapida</button>
+    <button type="button" data-lv="esperta" aria-pressed="false">Esperta</button>
+  </div>
+  <div class="drop" id="drop" tabindex="0" role="button" aria-label="Carica i PDF dei preventivi"><b>Hai i preventivi in PDF?</b><span>Trascinali qui o <span class="lnk">sceglili</span>, fino a 4. Li leggo solo nel tuo browser: non escono dal tuo dispositivo.</span><input type="file" id="pdfIn" accept="application/pdf,.pdf" multiple hidden></div>
+  <div class="pdfmsg" id="pdfMsg" role="status"></div>
+  <fieldset><legend>La tua casa</legend>
+    <div class="drop" id="dropB" tabindex="0" role="button" aria-label="Carica le bollette della luce in PDF" style="border-color:var(--grid-in);background:color-mix(in srgb,var(--grid-in) 6%,var(--paper))"><b>Hai le bollette della luce in PDF?</b><span>Trascinale qui o <span class="lnk">sceglile</span>: ricavo consumo annuo, prezzo reale per kWh, consumi per fascia e potenza del contatore. Restano nel tuo browser.</span><input type="file" id="billIn" accept="application/pdf,.pdf" multiple hidden></div>
+    <div class="found" id="billFound"></div>
+    <div class="f"><label for="prov">Provincia</label><select id="prov" data-k="prov"></select><small id="provNote"></small></div>
+    <div class="f"><label for="orient">Tetto rivolto a</label><select id="orient" data-k="orient"><option value="sud">Sud</option><option value="sudest">Sud-est o sud-ovest</option><option value="estovest">Est-ovest</option><option value="nord">Nord o quasi</option></select></div>
+    <div class="f"><label for="ombre">Ombre sul tetto</label><select id="ombre" data-k="ombre"><option value="no">Nessuna</option><option value="poche">Qualche ora</option><option value="molte">Molte</option></select></div>
+    <div class="f"><label for="cons">Consumo annuo (kWh)</label><input id="cons" inputmode="numeric" data-k="cons"><small>Lo trovi in bolletta, alla voce consumo annuo.</small></div>
+    <div class="f"><label for="pres">Di giorno in casa c’è qualcuno</label><select id="pres" data-k="pres"><option value="poca">Quasi mai</option><option value="media">A volte</option><option value="molta">Quasi sempre</option></select><small>Decide quanta energia usi mentre il sole la produce. È la leva più potente.</small></div>
+    <div class="f"><label for="prezzo">Prezzo dell’energia in bolletta (€/kWh)</label><input id="prezzo" inputmode="decimal" data-k="prezzo"><small>Totale della bolletta diviso i kWh consumati.</small></div>
+    <div class="f"><label for="potImp">Potenza del contatore (kW)</label><input id="potImp" inputmode="decimal" data-k="potImp"><small>La “potenza impegnata” in bolletta, di solito 3 kW. Serve alla giornata simulata.</small></div>
+    <div class="f"><label for="imm">Immobile</label><select id="imm" data-k="imm"><option value="princ">Abitazione principale</option><option value="altro">Seconda casa o altro</option></select></div>
+    <div class="f"><label for="anno">Pagamento</label><select id="anno" data-k="anno"><option value="2026">entro il 31/12/2026</option><option value="2027">dal 2027</option></select><small>Dal 2027 la detrazione scende: 36% abitazione principale, 30% altri immobili.</small></div>
+  </fieldset>
+  <fieldset class="xp"><legend>Le ipotesi</legend>
+    <div class="f"><label for="resa">Produzione per kW all’anno (kWh)</label><input id="resa" inputmode="numeric" data-k="resa" placeholder="auto"><small>Vuoto: stima dalla latitudine della provincia. Se il preventivo ha una simulazione, mettila qui.</small></div>
+    <div class="f"><label for="autoD">Autoconsumo diretto (% della produzione)</label><input id="autoD" inputmode="decimal" data-k="autoD" placeholder="auto"><small>Vuoto: stima dalla presenza in casa (25%, 35% o 45%).</small></div>
+    <div class="f"><label for="infl">Aumento annuo del prezzo dell’energia (%)</label><input id="infl" inputmode="decimal" data-k="infl"></div>
+    <div class="f"><label for="rid">Energia venduta alla rete (€/kWh)</label><input id="rid" inputmode="decimal" data-k="rid"><small>Ritiro Dedicato del GSE: nel 2026 tra circa 0,05 e 0,11 €/kWh.</small></div>
+    <div class="f"><label for="man">Manutenzione (€ l’anno)</label><input id="man" inputmode="decimal" data-k="man"></div>
+    <div class="f"><label for="invA">Inverter da sostituire all’anno</label><input id="invA" inputmode="numeric" data-k="invA"></div>
+    <div class="f"><label for="invC">Costo del nuovo inverter (€)</label><input id="invC" inputmode="decimal" data-k="invC"></div>
+    <div class="f"><label for="batA">Batteria da sostituire all’anno</label><input id="batA" inputmode="numeric" data-k="batA"></div>
+    <div class="f"><label for="batC">Nuova batteria (€ per kWh)</label><input id="batC" inputmode="decimal" data-k="batC"></div>
+    <div class="f"><label for="irpef">Imposte che paghi ogni anno (€)</label><input id="irpef" inputmode="decimal" data-k="irpef" placeholder="non so"><small>Se la detrazione supera le tue imposte, la parte in più si perde.</small></div>
+  </fieldset>
+  <div id="offers"></div>
+  <div class="btnrow">
+    <button type="button" class="btn main" id="bNew">Nuova valutazione</button>
+    <button type="button" class="btn" id="bPrint">Scarica il PDF</button>
+    <button type="button" class="btn" id="bCopy">Copia il verdetto</button>
+    <button type="button" class="btn" id="bReset">Valori di esempio</button>
+  </div>
+</form>
+
+<main aria-live="polite">
+  <section class="card" aria-labelledby="hStage">
+    <div class="stage-h">
+      <h2 id="hStage" style="margin:0">Il collaudo, dal satellite al quadro elettrico</h2>
+      <div class="steps" role="group" aria-label="Livello di zoom">
+        <button type="button" data-step="italia" aria-pressed="true">Italia</button>
+        <button type="button" data-step="prov" aria-pressed="false">Provincia</button>
+        <button type="button" data-step="casa" aria-pressed="false">Casa</button>
+        <button type="button" data-step="schema" aria-pressed="false">Schema</button>
+      </div>
+    </div>
+    <div class="stage" id="stage">
+      <svg id="map" viewBox="0 0 600 702" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Mappa d’Italia con la provincia selezionata"></svg>
+      <svg id="house" class="hide" viewBox="0 0 1000 700" role="img" aria-label="Sezione della casa con pannelli, inverter, batteria e rete"></svg>
+      <svg id="schema" class="hide" viewBox="0 0 1000 700" role="img" aria-label="Schema elettrico dell’impianto con i flussi di energia"></svg>
+      <div class="mode" role="group" aria-label="Promessa o realtà"><button type="button" class="real" data-mode="realta" aria-pressed="true">Realtà</button><button type="button" class="prom" data-mode="promessa" aria-pressed="false">Promessa</button></div>
+      <div class="cap" id="cap"></div>
+    </div>
+    <div class="controls">
+      <div class="clock"><button type="button" class="btn sun" id="bPlay" aria-label="Avvia la giornata">▶</button><span class="t mono" id="clock">12:00</span></div>
+      <input type="range" id="tSlider" min="0" max="1439" step="1" value="720" aria-label="Ora della giornata">
+      <label class="sel">Stagione <select id="season"><option value="estate">Estate</option><option value="mezze" selected>Primavera e autunno</option><option value="inverno">Inverno</option></select></label>
+      <label class="sel">Impianto <select id="simOffer"></select></label>
+    </div>
+    <div class="legend"><span><i style="background:var(--solar)"></i>dal sole</span><span><i style="background:var(--self)"></i>usata in casa</span><span><i style="background:var(--batt)"></i>batteria</span><span><i style="background:var(--grid-out)"></i>regalata alla rete</span><span><i style="background:var(--grid-in)"></i>comprata dalla rete</span></div>
+    <div class="meters" id="meters"></div>
+    <h3 style="margin:16px 0 0;font-size:1.02rem">Accendi gli elettrodomestici</h3>
+    <p class="note" style="margin:2px 0 0">Ognuno parte all’ora dell’orologio e consuma per la sua durata tipica. Il consumo di base della casa viene dal tuo consumo annuo.</p>
+    <div class="apps" id="apps"></div>
+  </section>
+
+  <section class="card" id="roofCard" aria-labelledby="hRoof">
+    <h2 id="hRoof">Il tuo tetto visto dall’alto <span class="note" style="font-weight:400">(facoltativo)</span></h2>
+    <p class="note" style="margin:0">Se vuoi, traccia il perimetro del tuo tetto su una foto satellite: al resto penso io. Il collaudo userà l’esposizione reale e calcolerà la soluzione migliore per i tuoi consumi. Se salti questa parte, valgono i dati dei preventivi.</p>
+    <label class="check"><input type="checkbox" id="roofOn"> Usa il mio tetto nel collaudo</label>
+    <details class="howto"><summary>Come fare lo screenshot della vista satellite</summary>
+      <ol><li>Apri Google Maps (o un’altra mappa), cerca il tuo indirizzo e passa alla vista <b>Satellite</b>.</li><li>Ingrandisci finché il tetto riempie bene lo schermo. <b>Non ruotare la mappa</b>: il Nord deve restare in alto.</li><li>Da computer: su Windows premi <b>Windows + Maiusc + S</b> e seleziona l’area; su Mac premi <b>Cmd + Maiusc + 4</b>. Da telefono: fai uno screenshot con i tasti del telefono.</li><li>Hai una foto fatta con il drone? Va bene anche quella: scattata dall’alto, in verticale. Se il Nord non è in alto, lo indichi con un tocco dopo averla caricata.</li><li>Carica l’immagine qui sotto e segui la guida passo passo.</li><li>Non vedi bene i colmi? In Google Maps o Google Earth attiva la <b>vista 3D</b> e inclina la mappa: le falde si riconoscono subito. Lo screenshot però va fatto dall’alto, con il Nord in alto.</li></ol></details>
+    <ol class="guide" id="guide"></ol>
+    <div class="rooftools">
+      <label class="btn sun">Carica screenshot o foto del drone<input type="file" id="roofImg" accept="image/*" hidden></label>
+      <button type="button" class="btn" id="rRedo">Ritraccia il perimetro</button>
+      <button type="button" class="btn" id="rView" hidden>Mostra la foto</button>
+      <span class="note" id="stepInfo"></span>
+    </div>
+    <div class="northc" id="northBox" hidden><span>Dov’è il Nord nella foto?</span><button type="button" class="btn" data-north="0">In alto</button><button type="button" class="btn" data-north="90">A destra</button><button type="button" class="btn" data-north="180">In basso</button><button type="button" class="btn" data-north="270">A sinistra</button><input type="range" id="northR" min="0" max="355" step="5" aria-label="Direzione del Nord nella foto"><span class="note" id="northV"></span></div>
+    <div class="roofwrap"><svg id="roof" viewBox="0 0 800 500" role="img" aria-label="Il tuo tetto visto dall’alto con i pannelli"></svg>
+      <div class="ptools" id="ptools" hidden role="toolbar" aria-label="Pannello selezionato"><button type="button" id="pRm" title="Ruota a sinistra di 15°" aria-label="Ruota a sinistra di 15 gradi">↺</button><button type="button" id="pRp" title="Ruota a destra di 15°" aria-label="Ruota a destra di 15 gradi">↻</button><button type="button" id="pOn">Spegni</button><button type="button" id="pDel" aria-label="Elimina">Elimina</button><button type="button" id="pDesel" aria-label="Fatto">✓</button></div></div>
+    <div class="ask" id="sideAsk" hidden style="position:static;transform:none;margin:10px 0 0;display:inline-flex;flex-wrap:wrap"><span>Il lato in giallo è lungo circa</span><input id="sideM" inputmode="decimal"><span>m</span><button type="button" class="btn main" id="sideOk">OK</button></div>
+    <div class="rooftools">
+      <button type="button" class="btn main" id="rClose" hidden>Fatto: chiudi il perimetro</button>
+      <button type="button" class="btn" id="rUndo" hidden>Annulla l’ultimo punto</button>
+      <button type="button" class="btn main" id="rDone" hidden>Ho finito le falde</button>
+      <button type="button" class="btn" id="rDelFace" hidden>Togli l’ultima falda</button></div>
+    <div id="typeBox"><p class="note" style="margin:8px 0 4px">Che forma ha il tuo tetto? Scegli il disegno più simile.</p>
+      <div class="types" id="types"></div>
+      <p class="note" style="margin:6px 0 0"><a href="#" id="multiLink" class="lnk">Il mio tetto ha più falde: le traccio una alla volta</a></p></div>
+    <div class="sum" id="roofSum"></div>
+
+    <div class="btnrow" style="margin-top:8px"><button type="button" class="btn sun" id="bSimRoof" hidden>▶ Simula la giornata con i miei pannelli</button><label class="sel" id="battBox" hidden>con batteria <select id="roofBattSel"><option value="0">nessuna</option><option value="5">5 kWh</option><option value="10">10 kWh</option><option value="15">15 kWh</option></select></label><button type="button" class="btn" id="pAdd">+ Aggiungi pannello</button></div>
+    <p class="note" id="editHint" hidden style="margin:6px 0 0">Tocca un pannello: puoi trascinarlo, girarlo con la maniglia tonda o con ↺ ↻, spegnerlo o eliminarlo.</p>
+    <div class="btnrow"><button type="button" class="btn" id="bOpt">Ricalcola la soluzione migliore</button></div>
+    <div id="optOut"></div>
+  </section>
+
+  <section class="card" aria-labelledby="hOff"><h2 id="hOff">I preventivi al collaudo</h2><div class="offers" id="offersOut"></div></section>
+  <section class="card"><h2>Chi ha gonfiato di più</h2><div class="scroll" id="rank"></div><p class="note" id="rankNote"></p></section>
+  <section class="card">
+    <details class="sec" open><summary><h3>Prima di firmare: le domande da fare</h3></summary><div class="body" id="sAsk"></div></details>
+    <details class="sec"><summary><h3>La batteria, presa da sola</h3></summary><div class="body" id="sBatt"></div></details>
+    <details class="sec"><summary><h3>Il conto anno per anno</h3></summary><div class="body" id="sYears"></div></details>
+    <details class="sec"><summary><h3>Le ipotesi del calcolo</h3></summary><div class="body" id="sDice"></div></details>
+  </section>
+  <section class="card verdict" aria-labelledby="hVer"><h2 id="hVer">Il verbale di collaudo</h2><p class="v" id="verdict"></p><p class="note" id="verdict2"></p></section>
+</main>
+</div>
+
+<footer class="foot">
+  <section class="legal" id="avvertenze" aria-labelledby="hLegal">
+    <h2 id="hLegal">Avvertenze legali ed esonero di responsabilità</h2>
+    <p class="stamp">Data di aggiornamento: ottobre 2026 (ultima verifica delle fonti: 30 ottobre 2026; versione 1.0 del 9 novembre 2026)</p>
+    <p>Il Collaudo del Fotovoltaico è uno strumento gratuito, fornito “così com’è”, a scopo esclusivamente informativo, esemplificativo e satirico, con finalità anche ludiche. Serve a confrontare i preventivi e ad approfondirne le condizioni con chi di dovere. L’ironia riguarda il modo in cui gli impianti vengono venduti, non la tecnologia; i numeri sono stime.</p>
+    <ul>
+      <li><b>Non sostituisce un professionista.</b> Non sostituisce in alcun modo un sopralluogo, un progetto, un collaudo o una simulazione di producibilità di un tecnico abilitato, né il parere di un consulente fiscale, né i preventivi, i contratti e i documenti dell’installatore o della finanziaria. Non costituisce consulenza tecnica, fiscale, finanziaria o legale, né offerta, raccomandazione o sollecitazione all’acquisto. Il “collaudo” di questo strumento è un gioco di parole, non un collaudo tecnico.</li>
+      <li><b>Informazioni datate.</b> Detrazioni, regole sulla vendita dell’energia, prezzi e valori di esempio sono riportati in forma sintetica e aggiornati a ottobre 2026: detrazione del 50% per l’abitazione principale e del 36% per gli altri immobili per le spese del 2026, prevista al 36% e al 30% dal 2027; Scambio sul Posto chiuso ai nuovi impianti; Ritiro Dedicato come riferimento. Possono cambiare in qualsiasi momento. Lo strumento non si aggiorna da solo e gli autori non si impegnano ad aggiornarlo.</li>
+      <li><b>Calcoli e simulazioni indicativi.</b> Produzione stimata dalla latitudine della provincia, curve giornaliere, consumi degli elettrodomestici, autoconsumo, prezzi futuri, durata dei componenti e costi di sostituzione sono stime semplificate basate su valori medi e sui dati inseriti dall’utente, che ne è il solo responsabile. L’Indice di Fuffa è un indice sintetico, non una misura tecnica. La lettura automatica dei PDF è indicativa. Non sono garantite l’esattezza, la completezza né l’idoneità dei risultati a uno scopo specifico.</li>
+      <li>Le battute riguardano pratiche commerciali diffuse e non si riferiscono ad alcun installatore, produttore, venditore, finanziaria o persona determinata.</li>
+      <li><b>Esonero di responsabilità.</b> Nei limiti massimi consentiti dalla legge, gli autori non rispondono di alcun danno, diretto o indiretto, derivante dall’uso o dal mancato uso dello strumento, da decisioni prese o non prese sulla base dei suoi risultati, da errori od omissioni, né da informazioni non più attuali, comprese le modifiche del quadro normativo, fiscale o di mercato successive a ottobre 2026. Ogni decisione resta tua: prima di firmare verifica ogni dato con l’installatore e con un professionista di tua fiducia.</li>
+      <li>Usando lo strumento dichiari di aver letto, compreso e accettato queste avvertenze.</li>
+    </ul>
+  </section>
+  <p>Il Collaudo del Fotovoltaico non registra niente da nessuna parte: i dati e i PDF che carichi restano solo in questo browser.</p>
+  <p>Lo screenshot del tetto resta nel tuo browser e serve solo a disporre i pannelli: le immagini satellitari appartengono ai rispettivi fornitori, usale per uso personale.</p>
+  <p>Confini delle province: elaborazione su dati ISTAT, licenza CC-BY 4.0 (repository geojson-italy di Openpolis), semplificati per la visualizzazione.</p>
+  <p>Testi, grafica e codice realizzati con il supporto di strumenti di intelligenza artificiale.</p>
+  <p>Dalla stessa officina dei Bugiardini, del Tassametro da riunione e di <b>«Da grande farò il Fuffa Guru»</b> di Nicola Marini, il manuale per smontare la fuffa con automazioni e agenti AI.</p>
+  <div class="cta"><a href="https://www.amazon.it/dp/B0HL52X9VB" target="_blank" rel="noopener">Il libro su Amazon</a><a href="https://fuffalibrary.lemonsqueezy.com" target="_blank" rel="noopener">Capitolo 1 gratis</a><a href="https://ennevolution-boop.github.io/bugiardino-mutuo/" target="_blank" rel="noopener">Il Bugiardino del Mutuo</a></div>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+var KEY="collaudo-fv-v1";
+var AGG={label:"ottobre 2026",date:new Date(2026,9,30),staleMonths:6};
+var YEARS=25,DEGR=0.005,CYCLES=260,BATT_EFF=0.9;
+var ORIENT={sud:1,sudest:0.95,estovest:0.85,nord:0.65};
+var OMBRE={no:1,poche:0.92,molte:0.8};
+var PRES={poca:0.25,media:0.35,molta:0.45};
+var ALIQ={"2026":{princ:0.5,altro:0.36},"2027":{princ:0.36,altro:0.30}};
+var KEYS=["A","B","C","D"];
+var PROV=[{"n":"Agrigento","a":"AG","r":"Sicilia","lat":37.44,"c":[344.6,651.6],"b":[316.2,631.0,57.6,43.9],"d":"M355 668.3L368.6 674.9L373.8 674.2L372.5 663.6L359.4 652.3L355.8 641.6L358.5 635.1L340.8 641.3L325.5 634.5L322.1 631L316.2 636.6L316.3 642.2L322.2 647.5L329.4 647.7L337.8 656.7L349.3 661.9L355 668.3Z"},{"n":"Alessandria","a":"AL","r":"Piemonte","lat":44.86,"c":[100.3,148.2],"b":[75.2,124.4,55.2,47.2],"d":"M82.4 170.9L98.3 171.6L115.7 167.7L120.4 160.9L129.9 164.5L129.8 159.6L130.5 155.1L119.8 144.6L113.7 134.7L108 137.9L101.6 135.3L96.9 126.9L93 124.4L76.9 126.9L75.8 130L75.2 133.4L87.3 136.6L87.3 144.2L93.9 154.6L87.2 160.3L82.4 170.9Z"},{"n":"Ancona","a":"AN","r":"Marche","lat":43.5,"c":[329.6,240.0],"b":[309.8,223.1,44.1,36.6],"d":"M342.8 232L330.2 223.1L324.7 225L319.5 233.5L309.8 242.9L310.9 254.9L314.6 259.7L323.5 251.3L326.1 244.5L338.4 247.5L353.9 241.9L348 231.9L342.8 232Z"},{"n":"Arezzo","a":"AR","r":"Toscana","lat":43.56,"c":[269.8,236.0],"b":[240.7,214.5,48.9,48.2],"d":"M276.2 238.1L281.8 232.6L289.6 225.5L285.4 222.2L276.5 222.9L268.6 220.7L256.4 214.5L247.9 229.2L240.7 236.9L258.4 258.1L269.1 262.8L278.6 256.8L272.3 245.9L276.2 238.1Z"},{"n":"Ascoli Piceno","a":"AP","r":"Marche","lat":42.85,"c":[345.0,284.1],"b":[331.0,269.6,36.7,25.3],"d":"M347 289.3L367.7 281.2L364.4 269.6L341.3 276.3L333.7 281.4L333.4 283.1L331 292.2L339.5 294.9L347 289.3Z"},{"n":"Asti","a":"AT","r":"Piemonte","lat":44.83,"c":[78.0,149.6],"b":[63.6,130.0,30.2,41.0],"d":"M66.4 148.7L75.8 151.2L81.6 156.9L79.1 163.5L82 170.3L82.4 170.9L87.2 160.3L93.9 154.6L87.3 144.2L87.3 136.6L75.2 133.4L75.8 130L65.6 131.2L63.6 143.7L66.4 148.7Z"},{"n":"Avellino","a":"AV","r":"Campania","lat":41.03,"c":[423.8,408.0],"b":[400.8,390.8,49.0,35.6],"d":"M402.1 405.9L400.8 409.2L402.5 420.2L429.4 426.4L439.3 421.1L449 416.1L449.8 406.1L437.4 403.5L433 399.8L429.9 390.8L420.5 398L422.9 401.8L414 407.5L402.1 405.9Z"},{"n":"Bari","a":"BA","r":"Puglia","lat":40.88,"c":[514.1,418.1],"b":[483.1,394.3,59.9,35.4],"d":"M538.3 422.1L542.9 417.2L526.2 404.7L500.2 394.3L492.4 396.6L483.1 415.5L485.2 420.9L493 429.7L502.4 426L509.4 429.3L530.7 429.6L541.1 426.9L538.3 422.1Z"},{"n":"Barletta-Andria-Trani","a":"BT","r":"Puglia","lat":41.15,"c":[482.0,399.4],"b":[466.3,381.0,33.9,34.5],"d":"M500.2 394.3L474.1 381L473.9 394.9L466.3 400.4L470.4 402.4L477.5 415.2L483.1 415.5L492.4 396.6L500.2 394.3Z"},{"n":"Belluno","a":"BL","r":"Veneto","lat":46.29,"c":[276.6,50.5],"b":[255.0,24.3,53.0,54.3],"d":"M255.1 71.5L260.9 78.5L268.6 74L291.2 67.6L295.8 59.8L287.4 53L296.2 42.4L302.8 36.4L308 27.4L295.1 24.3L281.8 29.1L275 24.8L270.4 33.4L262.4 35.9L261.6 45.5L268 56.9L265.6 62.3L255 64.3L255.1 71.5Z"},{"n":"Benevento","a":"BN","r":"Campania","lat":41.19,"c":[410.2,396.9],"b":[393.1,376.8,36.8,32.4],"d":"M402.1 405.9L414 407.5L422.9 401.8L420.5 398L429.9 390.8L426 387.3L422.8 376.8L414.5 380.9L397.4 383.9L393.1 392.6L398.1 406.6L398.7 409L400.8 409.2L402.1 405.9Z"},{"n":"Bergamo","a":"BG","r":"Lombardia","lat":45.76,"c":[157.5,86.8],"b":[142.2,64.6,36.5,44.7],"d":"M149.5 106L164.6 109.3L162.7 101.7L167.2 93.2L173.3 92L175 75.3L178.7 66.6L171.1 64.6L164.4 67.3L152.2 66.4L146.3 69.7L146.1 79L142.2 86.7L143.7 92.9L144.7 94.9L145.9 104.1L149.5 106Z"},{"n":"Biella","a":"BI","r":"Piemonte","lat":45.57,"c":[71.8,99.5],"b":[63.9,86.9,20.3,25.8],"d":"M66.1 89.1L64 98.3L63.9 98.8L70.6 107.8L70.8 108L70.6 111L75.5 112.8L84.2 100.7L82.9 92L75.5 86.9L66.1 89.1Z"},{"n":"Bologna","a":"BO","r":"Emilia-Romagna","lat":44.33,"c":[232.6,183.7],"b":[211.3,151.7,49.2,50.2],"d":"M211.3 198.3L216.4 201.9L223.1 200.1L230.8 199.4L241.7 190.3L247.1 195.5L250 190.3L260.2 182.6L260.4 168.6L250.5 157.9L235.4 151.7L227.2 153L224.1 170.5L218.9 189.7L213.6 190.4L211.3 198.3Z"},{"n":"Bolzano/Bozen","a":"BZ","r":"Trentino-Alto Adige/Südtirol","lat":46.67,"c":[240.6,25.0],"b":[189.7,0.0,105.4,55.5],"d":"M244.7 45.7L252.2 38.4L262.4 35.9L270.4 33.4L275 24.8L281.8 29.1L295.1 24.3L290.2 21.6L284.5 10.2L277.2 2.1L267.6 0L257.4 4.5L251.7 1.7L236.8 3.1L225.4 8.8L221.7 18.5L211.1 17.6L203.9 11L193.8 12.4L189.7 23.8L194.7 28.6L193 34.4L201.5 40L218.9 37.7L231.7 39.2L228.8 50.6L231 55.5L244.7 45.7Z"},{"n":"Brescia","a":"BS","r":"Lombardia","lat":45.71,"c":[185.5,90.4],"b":[162.7,47.1,49.8,77.3],"d":"M191.8 116.5L195.3 110.2L203.2 110.1L201.9 97.5L212.5 81.8L198.6 85.1L193 72L199.7 53.5L196.2 47.1L186.7 50.9L178.2 59.6L178.7 66.6L175 75.3L173.3 92L167.2 93.2L162.7 101.7L164.6 109.3L164.3 114L175.2 121.4L186.2 124.4L191.8 116.5Z"},{"n":"Brindisi","a":"BR","r":"Puglia","lat":40.63,"c":[558.5,435.2],"b":[538.3,417.2,40.3,34.8],"d":"M563.7 429.7L547.2 421.3L542.9 417.2L538.3 422.1L541.1 426.9L547.2 436.3L547.9 445L554.9 446.4L563.6 452L577.8 444.4L577.8 444.3L578.7 442.8L574.6 434.3L563.7 429.7Z"},{"n":"Cagliari","a":"CA","r":"Sardegna","lat":39.38,"c":[125.6,520.0],"b":[104.5,487.9,48.0,65.9],"d":"M112.1 538.9L111.6 553.8L120.3 546.5L121.7 533.9L130.4 530.2L141.6 536.8L147.8 536.6L152.6 508.3L140.8 503L139.7 495.6L133.5 487.9L128.1 489.1L115.9 494.2L123.4 494.7L116.1 518.5L104.5 520.2L108.1 533.5L112.1 538.9Z"},{"n":"Caltanissetta","a":"CL","r":"Sicilia","lat":37.33,"c":[376.7,658.8],"b":[355.8,635.1,40.1,46.2],"d":"M373.8 674.2L380.6 675.2L389 681.3L394.4 677.8L395.9 672.5L390.9 667.4L389.7 660.6L376.2 658.3L379.7 648.6L378.8 639.5L369.7 641.6L365.9 635.3L358.5 635.1L355.8 641.6L359.4 652.3L372.5 663.6L373.8 674.2Z"},{"n":"Campobasso","a":"CB","r":"Molise","lat":41.61,"c":[409.6,368.5],"b":[391.2,337.2,38.1,46.7],"d":"M397.4 383.9L414.5 380.9L422.8 376.8L419.2 373L427.7 364L429.4 346.9L411.3 337.2L396.4 358.3L397.8 369.1L391.2 379.8L397.4 383.9Z"},{"n":"Caserta","a":"CE","r":"Campania","lat":41.22,"c":[383.6,395.2],"b":[359.9,375.5,38.8,41.3],"d":"M398.1 406.6L393.1 392.6L397.4 383.9L391.2 379.8L378 375.5L370.8 378.5L365.6 386.9L359.9 394.8L373.6 416.7L379 411.3L398.7 409L398.1 406.6Z"},{"n":"Catania","a":"CT","r":"Sicilia","lat":37.48,"c":[412.3,648.6],"b":[389.7,617.6,45.7,60.3],"d":"M431 642.4L435.4 626.6L428 619.9L421.4 620.8L410.5 617.6L409.4 625.9L408.5 635.2L413.5 638.2L411.8 647L406 643.5L393.8 661.6L389.7 660.6L390.9 667.4L395.9 672.5L394.4 677.8L400.4 677.9L412 672.4L417 660.3L416.7 653.7L427 657.1L426.7 649.1L431 642.4Z"},{"n":"Catanzaro","a":"CZ","r":"Calabria","lat":38.83,"c":[496.7,557.0],"b":[477.7,532.4,40.3,49.2],"d":"M494.5 575.2L494 575.9L502.2 581.6L500.9 566.7L503.4 558.5L517.8 550.5L518 545.4L509.9 541.6L503.8 532.4L494.3 541.5L485.5 538.9L477.7 542.3L483.9 551.3L483.6 558.5L491.5 563.1L489.4 569.9L494.5 575.2Z"},{"n":"Chieti","a":"CH","r":"Abruzzo","lat":42.09,"c":[390.4,335.6],"b":[376.3,311.8,35.0,46.5],"d":"M388.3 349L396.4 358.3L411.3 337.2L408.1 330.4L397.6 324.8L392.7 317.7L384.8 311.8L379.9 313.7L376.3 336.1L377.4 349.2L383.5 350.3L388.3 349Z"},{"n":"Como","a":"CO","r":"Lombardia","lat":45.92,"c":[128.4,75.8],"b":[115.3,54.6,26.7,39.9],"d":"M122.5 94.4L132.2 87.9L136.4 79.1L132.6 73.9L134.9 61.9L140.6 61.1L141.9 55.9L132.2 54.6L120.2 68L120.4 82.8L115.3 81.9L117.3 89.8L122.5 94.4Z"},{"n":"Cosenza","a":"CS","r":"Calabria","lat":39.62,"c":[490.9,503.8],"b":[460.5,469.6,64.0,72.7],"d":"M471.6 513.9L475.5 525.6L477.7 542.3L485.5 538.9L494.3 541.5L503.8 532.4L511.7 532.2L511.2 525.8L520.9 518.9L524.5 512.9L512.1 503.8L500.1 501.1L498.2 489.6L504.5 480.5L505.3 469.7L493.5 469.6L493 474L490.4 481.2L475.5 484.7L471.7 478.9L463.8 477.6L460.5 482.9L463.6 499.5L471.6 513.9Z"},{"n":"Cremona","a":"CR","r":"Lombardia","lat":45.26,"c":[165.0,120.6],"b":[142.6,104.1,50.9,38.5],"d":"M145.9 104.1L144.1 107.9L142.6 112.1L156.1 122.3L155.8 122.4L164.7 129.4L174.4 135.3L183 137L193.6 142.6L193.6 137.3L186.2 124.4L175.2 121.4L164.3 114L164.6 109.3L149.5 106L145.9 104.1Z"},{"n":"Crotone","a":"KR","r":"Calabria","lat":39.17,"c":[518.7,534.2],"b":[503.8,512.9,29.0,38.9],"d":"M503.8 532.4L509.9 541.6L518 545.4L517.8 550.5L528.9 551.8L532.8 544.3L528.8 537.8L531 518.9L524.5 512.9L520.9 518.9L511.2 525.8L511.7 532.2L503.8 532.4Z"},{"n":"Cuneo","a":"CN","r":"Piemonte","lat":44.51,"c":[49.4,171.6],"b":[11.4,148.7,70.6,53.3],"d":"M16.1 177.1L13.6 180.7L20.5 191L40.1 198.5L50 196.1L54.8 202L57.3 196.7L70 198.7L74.7 183.6L79.7 178.8L82 170.3L79.1 163.5L81.6 156.9L75.8 151.2L66.4 148.7L64.1 150.3L63.8 150.3L51.8 149.8L42.6 154.8L36.2 153.1L22.1 157.7L16.2 161.8L11.4 170.3L16.1 177.1Z"},{"n":"Enna","a":"EN","r":"Sicilia","lat":37.6,"c":[395.2,640.6],"b":[376.2,623.8,37.3,37.8],"d":"M406 643.5L411.8 647L413.5 638.2L408.5 635.2L409.4 625.9L406.2 627.4L391.9 623.8L386.1 624.4L385.2 634L379.7 638.8L378.8 639.5L379.7 648.6L376.2 658.3L389.7 660.6L393.8 661.6L406 643.5Z"},{"n":"Fermo","a":"FM","r":"Marche","lat":43.09,"c":[349.3,268.2],"b":[332.4,254.1,32.0,27.3],"d":"M363.3 265.5L359 254.1L351.8 255.9L343.4 264.8L340.6 271.2L332.4 277.4L333.7 281.4L341.3 276.3L364.4 269.6L363.3 265.5Z"},{"n":"Ferrara","a":"FE","r":"Emilia-Romagna","lat":44.78,"c":[262.2,153.1],"b":[233.0,139.2,58.1,29.8],"d":"M260.4 168.6L270.9 165.5L278.8 169L284.6 163.6L284 153.2L291.1 152.4L282.4 143.6L269.2 139.2L261.2 139.9L252.1 145.8L242.1 141.7L233 141.6L238.6 147.7L235.4 151.7L250.5 157.9L260.4 168.6Z"},{"n":"Firenze","a":"FI","r":"Toscana","lat":43.82,"c":[231.4,218.4],"b":[206.0,190.3,50.7,53.2],"d":"M230.8 199.4L228.1 215.3L218.8 218.9L206.9 218.8L206 220.7L216.4 229.1L211.8 237.4L218.2 243.4L222.3 237L231 241.5L240.7 236.9L247.9 229.2L256.4 214.5L253.2 206.8L256.7 197.9L247.1 195.5L241.7 190.3L230.8 199.4Z"},{"n":"Foggia","a":"FG","r":"Puglia","lat":41.49,"c":[449.4,376.7],"b":[419.2,345.5,63.3,60.5],"d":"M429.9 390.8L433 399.8L437.4 403.5L449.8 406.1L466.3 400.4L473.9 394.9L474.1 381L468 373.6L467.9 368.1L482.4 357.1L481.9 349.6L475.8 345.5L443.4 348.7L429.4 346.9L427.7 364L419.2 373L422.8 376.8L426 387.3L429.9 390.8Z"},{"n":"Forlì-Cesena","a":"FC","r":"Emilia-Romagna","lat":44.02,"c":[273.3,204.6],"b":[253.2,183.9,40.6,39.0],"d":"M268.6 220.7L276.5 222.9L279.5 213.3L289.7 206.9L293.8 195.2L290.4 191L281.5 191.2L272.5 183.9L265.4 194.6L256.7 197.9L253.2 206.8L256.4 214.5L268.6 220.7Z"},{"n":"Frosinone","a":"FR","r":"Lazio","lat":41.62,"c":[349.2,367.9],"b":[321.8,345.5,50.3,42.7],"d":"M372 371.2L369 363.2L354.2 354.8L350.6 358.6L339.6 350.8L336.4 345.5L330.8 352.4L321.8 357.6L330.3 370.2L335.3 374.5L337 382.5L348.7 381.1L352.7 388.2L365.6 386.9L370.8 378.5L372 371.2Z"},{"n":"Gallura Nord-Est Sardegna","a":"OT","r":"Sardegna","lat":40.84,"c":[132.5,421.0],"b":[109.7,392.3,47.8,49.8],"d":"M129.3 441.3L134.2 442L149.1 429.8L157.5 433.1L153.4 419.8L148 415.2L143.5 400.9L131.1 392.3L125.3 400.7L120.3 401.5L109.7 414.5L118.2 412.9L121 423.9L120.4 431.6L129.5 435.2L129.3 441.3Z"},{"n":"Genova","a":"GE","r":"Liguria","lat":44.44,"c":[124.1,176.0],"b":[98.3,160.9,50.3,30.6],"d":"M101.2 180.4L107.3 177.2L132 183L145.5 191.5L148.6 187.8L143.9 178.4L144.6 168.5L129.9 164.5L120.4 160.9L115.7 167.7L98.3 171.6L101.2 180.4Z"},{"n":"Gorizia","a":"GO","r":"Friuli-Venezia Giulia","lat":45.8,"c":[344.1,83.8],"b":[333.9,66.9,17.7,25.4],"d":"M342.6 87.9L333.9 89.5L342.9 92.4L350.8 85.3L351.6 83.5L346.6 66.9L341.5 76.6L342.6 87.9Z"},{"n":"Grosseto","a":"GR","r":"Toscana","lat":42.8,"c":[234.0,287.5],"b":[205.8,262.1,56.1,54.3],"d":"M246.9 312.5L250.3 303.2L255.2 302.3L261.9 291.5L258.2 288.6L252.7 283.7L251.3 277.4L238.7 276.3L239 268.6L224.8 268.4L223.5 262.1L216.1 263L206.4 266.7L209.7 273.3L205.8 278L209.8 289.4L216.1 290.8L224.8 299.4L233.3 313.5L243.3 316.4L246.9 312.5Z"},{"n":"Imperia","a":"IM","r":"Liguria","lat":43.95,"c":[58.6,209.8],"b":[45.6,196.7,30.5,24.7],"d":"M46.6 213.4L45.6 220.9L52.7 221.4L67.6 216.2L76.1 210.3L68.2 205.3L70 198.7L57.3 196.7L54.8 202L46.6 213.4Z"},{"n":"Isernia","a":"IS","r":"Molise","lat":41.68,"c":[383.3,363.8],"b":[369.0,349.0,28.8,30.8],"d":"M388.3 349L383.5 350.3L380.5 357.9L369 363.2L372 371.2L370.8 378.5L378 375.5L391.2 379.8L397.8 369.1L396.4 358.3L388.3 349Z"},{"n":"L'Aquila","a":"AQ","r":"Abruzzo","lat":42.1,"c":[349.9,335.2],"b":[323.0,301.8,60.5,61.3],"d":"M369 363.2L380.5 357.9L383.5 350.3L377.4 349.2L376.3 336.1L361.3 331.5L364.1 322.9L360.1 313.4L345.3 309L341.4 301.8L330.3 303.5L327.4 311.8L329.2 317.7L340.2 329.7L334.1 333.3L327.6 330L323 334.1L326.7 340.2L336.4 345.5L339.6 350.8L350.6 358.6L354.2 354.8L369 363.2Z"},{"n":"La Spezia","a":"SP","r":"Liguria","lat":44.17,"c":[159.8,194.3],"b":[143.9,178.4,28.7,24.8],"d":"M170.1 202.7L171.1 203.2L172.5 198.4L154.3 181.4L143.9 178.4L148.6 187.8L145.5 191.5L161.7 202.9L170.1 202.7Z"},{"n":"Latina","a":"LT","r":"Lazio","lat":41.4,"c":[333.8,382.7],"b":[307.3,362.2,58.2,33.4],"d":"M310.1 381.6L316.5 383.3L323.8 394.5L335.7 389.7L349 395.6L352.8 392.2L359.9 394.8L365.6 386.9L352.7 388.2L348.7 381.1L337 382.5L335.3 374.5L330.3 370.2L324.2 370.6L315.5 362.2L307.3 375.6L310.1 381.6Z"},{"n":"Lecce","a":"LE","r":"Puglia","lat":40.19,"c":[581.5,464.7],"b":[561.8,442.8,38.2,45.9],"d":"M593.6 486.7L594.3 479.5L600 470.5L597 461.9L586.3 448L578.7 442.8L577.8 444.3L577.8 444.4L563.6 452L561.8 457.6L566.3 458.3L574.2 470.4L573.5 478.1L584 488.7L593.6 486.7Z"},{"n":"Lecco","a":"LC","r":"Lombardia","lat":45.87,"c":[138.4,79.4],"b":[132.2,61.1,14.1,32.2],"d":"M132.2 87.9L135.5 93.4L143.7 92.9L142.2 86.7L146.1 79L146.3 69.7L140.6 61.1L134.9 61.9L132.6 73.9L136.4 79.1L132.2 87.9Z"},{"n":"Livorno","a":"LI","r":"Toscana","lat":43.23,"c":[199.6,258.7],"b":[185.2,231.1,24.5,47.3],"d":"M204 257.3L197 252.1L192 231.1L185.2 234.6L196.8 258.4L195.3 278.4L205.8 278L209.7 273.3L206.4 266.7L204 257.3Z"},{"n":"Lodi","a":"LO","r":"Lombardia","lat":45.24,"c":[148.4,121.7],"b":[136.8,107.9,27.9,26.5],"d":"M144.1 107.9L136.8 117.1L141.8 125.6L145.7 125.6L146.5 127.1L147.4 129.3L155.7 134.4L164.7 129.4L155.8 122.4L156.1 122.3L142.6 112.1L144.1 107.9Z"},{"n":"Lucca","a":"LU","r":"Toscana","lat":43.98,"c":[195.2,207.8],"b":[177.4,188.0,29.5,35.2],"d":"M205.7 216.9L203 215.1L206.6 200.6L201.6 198L193.9 190.9L183 188L179.6 192.2L182.2 201.3L177.4 207.9L183.2 218.7L198.1 223.2L206 220.7L206.9 218.8L205.7 216.9Z"},{"n":"Macerata","a":"MC","r":"Marche","lat":43.16,"c":[333.4,263.1],"b":[314.6,241.9,44.4,41.2],"d":"M314.6 259.7L315.9 273.3L319.9 280.6L333.4 283.1L333.7 281.4L332.4 277.4L340.6 271.2L343.4 264.8L351.8 255.9L359 254.1L353.9 241.9L338.4 247.5L326.1 244.5L323.5 251.3L314.6 259.7Z"},{"n":"Mantova","a":"MN","r":"Lombardia","lat":45.09,"c":[210.0,131.9],"b":[186.2,110.1,55.9,34.1],"d":"M193.6 142.6L195.6 143.6L204.4 139.9L214.9 144.1L220.5 141.4L233 141.6L242.1 141.7L234.5 137.1L231 130.9L222.6 130.6L217.4 122.5L207 116.9L203.2 110.1L195.3 110.2L191.8 116.5L186.2 124.4L193.6 137.3L193.6 142.6Z"},{"n":"Massa-Carrara","a":"MS","r":"Toscana","lat":44.19,"c":[173.0,193.2],"b":[154.3,174.5,28.6,33.4],"d":"M171.1 203.2L177.4 207.9L182.2 201.3L179.6 192.2L183 188L177.3 182.2L161.4 174.5L154.3 181.4L172.5 198.4L171.1 203.2Z"},{"n":"Matera","a":"MT","r":"Basilicata","lat":40.45,"c":[493.7,447.5],"b":[475.3,420.9,41.3,53.1],"d":"M493 474L493.5 469.6L505.3 469.7L516.6 450.7L508.4 440.4L509.4 429.3L502.4 426L493 429.7L485.2 420.9L479 423.7L480.2 430.5L475.3 434.6L482.7 459.7L491.2 458.2L490.5 469.4L493 474Z"},{"n":"Medio Campidano","a":"VS","r":"Sardegna","lat":39.59,"c":[104.8,505.3],"b":[89.1,494.2,34.4,26.0],"d":"M94.6 497.1L89.1 515.3L94.3 512.8L104.5 520.2L116.1 518.5L123.4 494.7L115.9 494.2L112.7 500.3L103.1 502.8L94.6 497.1Z"},{"n":"Messina","a":"ME","r":"Sicilia","lat":38.0,"c":[416.1,613.8],"b":[381.2,596.9,70.5,30.5],"d":"M444.7 611.8L451.7 596.9L434.6 598.8L426.8 605.4L416.9 601.8L409.5 602.5L403.9 608.7L387.7 613L381.2 612.2L386.1 624.4L391.9 623.8L406.2 627.4L409.4 625.9L410.5 617.6L421.4 620.8L428 619.9L435.4 626.6L444.7 611.8Z"},{"n":"Milano","a":"MI","r":"Lombardia","lat":45.41,"c":[128.6,110.5],"b":[104.9,94.9,41.6,32.2],"d":"M111.8 111.6L121.5 117.9L136.8 117.1L144.1 107.9L145.9 104.1L144.7 94.9L135.1 101.9L122.4 96L109.9 97.5L104.9 100.4L109 106.8L109.1 107L111.8 111.6ZM145.7 125.6L141.8 125.6L146.5 127.1L145.7 125.6Z"},{"n":"Modena","a":"MO","r":"Emilia-Romagna","lat":44.55,"c":[215.1,168.8],"b":[193.9,141.4,44.7,56.9],"d":"M203.9 174.4L196.8 182.4L193.9 190.9L201.6 198L211.3 198.3L213.6 190.4L218.9 189.7L224.1 170.5L227.2 153L235.4 151.7L238.6 147.7L233 141.6L220.5 141.4L214.9 144.1L211.3 151.4L208.7 169.5L203.9 174.4Z"},{"n":"Monza e della Brianza","a":"MB","r":"Lombardia","lat":45.64,"c":[135.1,94.5],"b":[122.4,87.9,22.3,14.0],"d":"M144.7 94.9L143.7 92.9L135.5 93.4L132.2 87.9L122.5 94.4L122.4 96L135.1 101.9L144.7 94.9Z"},{"n":"Napoli","a":"NA","r":"Campania","lat":40.84,"c":[390.7,420.8],"b":[373.6,409.0,28.9,26.7],"d":"M373.6 416.7L381.5 423.9L387.5 421.4L396.3 430L395.6 435.6L401.7 430.6L397.5 425.3L402.5 420.2L400.8 409.2L398.7 409L379 411.3L373.6 416.7Z"},{"n":"Novara","a":"NO","r":"Piemonte","lat":45.59,"c":[98.7,98.5],"b":[86.9,82.0,24.9,35.1],"d":"M90.5 82L86.9 85.9L89.7 109.9L95.2 117L111.8 111.6L109.1 107L109 106.8L104.9 100.4L99.2 82.1L90.5 82Z"},{"n":"Nuoro","a":"NU","r":"Sardegna","lat":40.24,"c":[131.5,461.5],"b":[100.5,429.8,60.9,59.3],"d":"M133.8 481.4L135.7 475.1L146.2 462.9L151.4 462.5L158.3 451.2L161.5 441.9L157.5 433.1L149.1 429.8L134.2 442L129.3 441.3L128.3 452.5L121.8 455.6L110.2 453L100.5 456.1L103.2 463.5L118.8 462.9L121.5 471.2L117.1 476.1L119 483.2L128.1 489.1L133.5 487.9L133.8 481.4Z"},{"n":"Ogliastra","a":"OG","r":"Sardegna","lat":39.88,"c":[144.3,485.8],"b":[133.5,462.5,23.3,45.9],"d":"M152.6 508.3L156.8 472.4L151.4 462.5L146.2 462.9L135.7 475.1L133.8 481.4L133.5 487.9L139.7 495.6L140.8 503L152.6 508.3Z"},{"n":"Oristano","a":"OR","r":"Sardegna","lat":40.04,"c":[105.2,475.2],"b":[89.3,448.8,38.7,54.0],"d":"M100.5 456.1L94.5 448.8L89.4 450.1L93.6 458.5L94.1 471.9L89.3 484L97.3 487.8L94.6 497.1L103.1 502.8L112.7 500.3L115.9 494.2L128.1 489.1L119 483.2L117.1 476.1L121.5 471.2L118.8 462.9L103.2 463.5L100.5 456.1Z"},{"n":"Padova","a":"PD","r":"Veneto","lat":45.38,"c":[262.9,112.4],"b":[241.6,91.7,39.2,40.2],"d":"M275.7 97.7L268.6 96.7L262.1 91.7L253.1 97.8L258.1 106.3L251.5 116.2L245.2 120.3L241.6 129.5L259 131.8L269.5 129.2L269.9 125.6L280.8 122.4L270 110.7L275.7 97.7Z"},{"n":"Palermo","a":"PA","r":"Sicilia","lat":37.83,"c":[353.2,625.0],"b":[320.0,598.4,66.0,43.2],"d":"M379.7 638.8L385.2 634L386.1 624.4L381.2 612.2L369.2 611.6L359.1 615.6L339.9 604.8L337.6 598.4L320.3 610.8L320.7 611.1L323.8 616.1L320 625.5L322.1 631L325.5 634.5L340.8 641.3L358.5 635.1L365.9 635.3L369.7 641.6L378.8 639.5L379.7 638.8Z"},{"n":"Parma","a":"PR","r":"Emilia-Romagna","lat":44.68,"c":[171.7,159.8],"b":[143.9,135.3,51.7,46.8],"d":"M154.3 181.4L161.4 174.5L177.3 182.2L190.3 168.2L191.5 152.2L195.6 143.6L193.6 142.6L183 137L174.4 135.3L169.5 142.7L169.5 148.8L144.6 168.5L143.9 178.4L154.3 181.4Z"},{"n":"Pavia","a":"PV","r":"Lombardia","lat":45.09,"c":[122.8,132.5],"b":[95.2,111.6,52.2,48.0],"d":"M95.2 117L96.9 126.9L101.6 135.3L108 137.9L113.7 134.7L119.8 144.6L130.5 155.1L129.8 159.6L137.7 150.9L133.7 145.4L141.9 132L147.4 129.3L146.5 127.1L141.8 125.6L136.8 117.1L121.5 117.9L111.8 111.6L95.2 117Z"},{"n":"Perugia","a":"PG","r":"Umbria","lat":43.04,"c":[296.4,271.7],"b":[267.7,232.6,65.7,67.5],"d":"M329.5 297.6L331 292.2L333.4 283.1L319.9 280.6L315.9 273.3L314.6 259.7L310.9 254.9L309.8 242.9L302.4 245.3L296.3 238.8L291.2 239.3L281.8 232.6L276.2 238.1L272.3 245.9L278.6 256.8L269.1 262.8L268.6 280.8L269 282.6L267.7 283L271.8 282.2L273.6 278.4L287 279.8L285.7 289.9L291 296L300 293.5L307.1 300.1L316.3 300.1L329.5 297.6Z"},{"n":"Pesaro e Urbino","a":"PU","r":"Marche","lat":43.7,"c":[303.1,226.3],"b":[281.8,208.3,48.4,36.9],"d":"M296.3 238.8L302.4 245.3L309.8 242.9L319.5 233.5L324.7 225L330.2 223.1L316.8 211.4L308.9 208.3L307.5 215.6L301.9 217.7L295.6 213.2L294.4 213.4L285.4 222.2L289.6 225.5L281.8 232.6L291.2 239.3L296.3 238.8Z"},{"n":"Pescara","a":"PE","r":"Abruzzo","lat":42.35,"c":[371.6,318.5],"b":[360.1,305.2,24.7,30.9],"d":"M376.3 336.1L379.9 313.7L384.8 311.8L379.3 306L371.4 305.2L362.4 308.5L360.1 313.4L364.1 322.9L361.3 331.5L376.3 336.1Z"},{"n":"Piacenza","a":"PC","r":"Emilia-Romagna","lat":44.9,"c":[151.4,144.9],"b":[129.8,129.3,44.6,39.2],"d":"M169.5 142.7L174.4 135.3L164.7 129.4L155.7 134.4L147.4 129.3L141.9 132L133.7 145.4L137.7 150.9L129.8 159.6L129.9 164.5L144.6 168.5L169.5 148.8L169.5 142.7Z"},{"n":"Pisa","a":"PI","r":"Toscana","lat":43.51,"c":[202.7,239.6],"b":[183.2,218.7,36.9,48.0],"d":"M183.2 218.7L185.2 234.6L192 231.1L197 252.1L204 257.3L206.4 266.7L216.1 263L220.1 258.3L218.2 243.4L211.8 237.4L216.4 229.1L206 220.7L198.1 223.2L183.2 218.7Z"},{"n":"Pistoia","a":"PT","r":"Toscana","lat":43.96,"c":[212.5,208.6],"b":[201.6,198.0,21.5,20.9],"d":"M221.8 213.2L223.1 200.1L216.4 201.9L211.3 198.3L201.6 198L206.6 200.6L203 215.1L205.7 216.9L206.9 218.8L218.8 218.9L221.8 213.2Z"},{"n":"Pordenone","a":"PN","r":"Friuli-Venezia Giulia","lat":46.08,"c":[302.5,65.2],"b":[287.4,42.4,33.0,42.1],"d":"M291.2 67.6L292.5 74L304.4 84.5L310.4 80.3L320.4 81.7L317.2 76.2L319.5 47.6L303.2 47.4L296.2 42.4L287.4 53L295.8 59.8L291.2 67.6Z"},{"n":"Potenza","a":"PZ","r":"Basilicata","lat":40.5,"c":[469.6,443.5],"b":[439.3,400.4,53.7,84.3],"d":"M475.3 434.6L480.2 430.5L479 423.7L485.2 420.9L483.1 415.5L477.5 415.2L470.4 402.4L466.3 400.4L449.8 406.1L449 416.1L439.3 421.1L441.6 428.6L447.8 432.7L452 447.6L463.1 459.3L455 474.8L460.5 482.9L463.8 477.6L471.7 478.9L475.5 484.7L490.4 481.2L493 474L490.5 469.4L491.2 458.2L482.7 459.7L475.3 434.6Z"},{"n":"Prato","a":"PO","r":"Toscana","lat":43.98,"c":[224.3,207.8],"b":[218.8,199.4,12.0,19.6],"d":"M223.1 200.1L221.8 213.2L218.8 218.9L228.1 215.3L230.8 199.4L223.1 200.1Z"},{"n":"Ragusa","a":"RG","r":"Sicilia","lat":36.91,"c":[406.4,687.8],"b":[389.0,672.4,33.4,29.1],"d":"M389 681.3L396.8 695.9L411.5 701.5L422.4 701.6L421.7 696.3L415.3 692.8L418.4 686.3L412 672.4L400.4 677.9L394.4 677.8L389 681.3Z"},{"n":"Ravenna","a":"RA","r":"Emilia-Romagna","lat":44.37,"c":[268.9,181.0],"b":[247.1,163.6,43.3,34.3],"d":"M260.4 168.6L260.2 182.6L250 190.3L247.1 195.5L256.7 197.9L265.4 194.6L272.5 183.9L281.5 191.2L290.4 191L285.2 171.5L284.6 163.6L278.8 169L270.9 165.5L260.4 168.6Z"},{"n":"Reggio Calabria","a":"RC","r":"Calabria","lat":38.25,"c":[477.6,596.4],"b":[454.4,575.4,47.8,43.8],"d":"M480.3 609.7L481 604.8L489.7 593.2L495.2 591.1L502.2 581.6L494 575.9L487.7 583.8L476.9 575.4L468.7 579.1L462.4 594.5L454.5 597.8L454.4 612.2L461 619.2L476.1 618.6L480.3 609.7Z"},{"n":"Reggio nell'Emilia","a":"RE","r":"Emilia-Romagna","lat":44.59,"c":[198.1,166.3],"b":[177.3,139.9,37.6,50.9],"d":"M203.9 174.4L208.7 169.5L211.3 151.4L214.9 144.1L204.4 139.9L195.6 143.6L191.5 152.2L190.3 168.2L177.3 182.2L183 188L193.9 190.9L196.8 182.4L203.9 174.4Z"},{"n":"Rieti","a":"RI","r":"Lazio","lat":42.42,"c":[320.7,313.6],"b":[293.5,292.2,47.9,42.8],"d":"M331 292.2L329.5 297.6L316.3 300.1L297.8 317.3L295.7 314.9L294.6 315.2L293.5 314.9L297.3 322L314.8 334.9L323 334.1L327.6 330L334.1 333.3L340.2 329.7L329.2 317.7L327.4 311.8L330.3 303.5L341.4 301.8L339.5 294.9L331 292.2Z"},{"n":"Rimini","a":"RN","r":"Emilia-Romagna","lat":43.89,"c":[291.8,213.8],"b":[276.5,195.2,32.4,27.7],"d":"M276.5 222.9L285.4 222.2L294.4 213.4L295.6 213.2L301.9 217.7L307.5 215.6L308.9 208.3L293.8 195.2L289.7 206.9L279.5 213.3L276.5 222.9Z"},{"n":"Roma","a":"RM","r":"Lazio","lat":41.91,"c":[297.7,348.3],"b":[257.6,322.0,78.8,59.6],"d":"M257.6 331.2L262.6 339.9L266.7 339.3L277.4 347L282.7 359.6L294.2 367.6L302.1 378.8L310.1 381.6L307.3 375.6L315.5 362.2L324.2 370.6L330.3 370.2L321.8 357.6L330.8 352.4L336.4 345.5L326.7 340.2L323 334.1L314.8 334.9L297.3 322L287.7 332.1L281.9 329.3L271.2 331.2L265.9 325.9L257.6 331.2Z"},{"n":"Rovigo","a":"RO","r":"Veneto","lat":45.03,"c":[264.6,136.6],"b":[231.0,127.3,68.0,25.1],"d":"M269.5 129.2L259 131.8L241.6 129.5L238.8 134.4L231 130.9L234.5 137.1L242.1 141.7L252.1 145.8L261.2 139.9L269.2 139.2L282.4 143.6L291.1 152.4L299 140.4L291.3 135.5L287.8 127.3L277.9 134.5L269.5 129.2Z"},{"n":"Salerno","a":"SA","r":"Campania","lat":40.49,"c":[426.7,444.4],"b":[395.6,420.2,67.5,58.0],"d":"M402.5 420.2L397.5 425.3L401.7 430.6L395.6 435.6L406.9 434.6L410.2 431.8L417.2 439.7L421.3 448.5L418.7 462L428.3 465.7L437.2 475.8L443.8 478.2L447.9 473.4L455 474.8L463.1 459.3L452 447.6L447.8 432.7L441.6 428.6L439.3 421.1L429.4 426.4L402.5 420.2Z"},{"n":"Sassari","a":"SS","r":"Sardegna","lat":40.62,"c":[103.5,436.0],"b":[76.0,412.9,53.6,43.2],"d":"M87.8 444L89.4 450.1L94.5 448.8L100.5 456.1L110.2 453L121.8 455.6L128.3 452.5L129.3 441.3L129.5 435.2L120.4 431.6L121 423.9L118.2 412.9L109.7 414.5L97.3 421.4L85.2 420.4L81 415.8L76 428.1L78.7 434.4L87.8 444Z"},{"n":"Savona","a":"SV","r":"Liguria","lat":44.24,"c":[82.7,189.6],"b":[68.2,170.3,33.0,40.0],"d":"M79.8 203.8L82.8 196.7L90.7 192.9L91.9 186.8L101.2 180.4L98.3 171.6L82.4 170.9L82 170.3L79.7 178.8L74.7 183.6L70 198.7L68.2 205.3L76.1 210.3L79.8 203.8Z"},{"n":"Siena","a":"SI","r":"Toscana","lat":43.1,"c":[244.4,267.1],"b":[216.1,236.9,53.0,51.8],"d":"M252.7 283.7L258.2 288.6L265.8 285.3L267.7 283L269 282.6L268.6 280.8L269.1 262.8L258.4 258.1L240.7 236.9L231 241.5L222.3 237L218.2 243.4L220.1 258.3L216.1 263L223.5 262.1L224.8 268.4L239 268.6L238.7 276.3L251.3 277.4L252.7 283.7Z"},{"n":"Siracusa","a":"SR","r":"Sicilia","lat":37.06,"c":[424.4,677.2],"b":[412.0,653.7,25.7,47.9],"d":"M431.6 667.1L432.9 661.6L427 657.1L416.7 653.7L417 660.3L412 672.4L418.4 686.3L415.3 692.8L421.7 696.3L422.4 701.6L427.2 696.6L430.4 686.9L437.7 680.4L431.6 667.1Z"},{"n":"Sondrio","a":"SO","r":"Lombardia","lat":46.27,"c":[161.9,52.2],"b":[132.2,29.3,69.3,40.3],"d":"M152.2 66.4L164.4 67.3L171.1 64.6L178.7 66.6L178.2 59.6L186.7 50.9L196.2 47.1L201.5 40L193 34.4L176.7 29.3L170 46.6L165.4 44.6L155.8 50.5L146.7 49.2L143.1 38.7L133.9 36.7L134.8 48.3L132.2 54.6L141.9 55.9L140.6 61.1L146.3 69.7L152.2 66.4Z"},{"n":"Sulcis Iglesiente","a":"CI","r":"Sardegna","lat":39.16,"c":[99.3,535.0],"b":[87.6,512.8,24.4,40.9],"d":"M88.4 520.3L91.2 534.8L87.6 543.6L97.7 542.6L100.6 549.6L108.3 551.4L108.8 552.5L111.6 553.8L112.1 538.9L108.1 533.5L104.5 520.2L94.3 512.8L89.1 515.3L88.4 520.3Z"},{"n":"Taranto","a":"TA","r":"Puglia","lat":40.5,"c":[539.8,444.1],"b":[508.4,426.9,55.1,30.8],"d":"M563.6 452L554.9 446.4L547.9 445L547.2 436.3L541.1 426.9L530.7 429.6L509.4 429.3L508.4 440.4L516.6 450.7L527.6 442.5L535.2 450.5L549 457.8L561.8 457.6L563.6 452Z"},{"n":"Teramo","a":"TE","r":"Abruzzo","lat":42.65,"c":[360.3,297.8],"b":[339.5,281.2,39.8,32.2],"d":"M368.5 285.1L367.7 281.2L347 289.3L339.5 294.9L341.4 301.8L345.3 309L360.1 313.4L362.4 308.5L371.4 305.2L379.3 306L372.1 294.5L368.5 285.1Z"},{"n":"Terni","a":"TR","r":"Umbria","lat":42.66,"c":[286.4,297.2],"b":[265.8,278.4,50.5,38.8],"d":"M267.7 283L265.8 285.3L272.6 297.8L281 296.9L286.3 308.6L286.2 308.9L293.5 314.9L294.6 315.2L295.7 314.9L297.8 317.3L316.3 300.1L307.1 300.1L300 293.5L291 296L285.7 289.9L287 279.8L273.6 278.4L271.8 282.2L267.7 283Z"},{"n":"Torino","a":"TO","r":"Piemonte","lat":45.19,"c":[49.5,125.4],"b":[0.0,98.2,76.9,59.6],"d":"M63.9 98.8L64 98.3L56 100.8L55.8 101L47.5 98.2L30 106.4L24.1 106.6L28.1 110.7L25.6 121.1L0 131.4L6.9 140.3L6.2 144.6L15.3 147.6L22.1 157.7L36.2 153.1L42.6 154.8L51.8 149.8L63.8 150.3L64.1 150.3L66.4 148.7L63.6 143.7L65.6 131.2L75.8 130L76.9 126.9L68.8 122.8L68.8 118.1L68.8 117.7L70.6 111L70.8 108L70.6 107.8L63.9 98.8Z"},{"n":"Trapani","a":"TP","r":"Sicilia","lat":37.86,"c":[312.5,623.0],"b":[293.4,606.1,30.4,37.4],"d":"M320.7 611.1L320.3 610.8L316.1 611.9L306.9 606.1L296.9 612.3L293.4 627.9L296.3 635.6L305.3 643.4L316.3 642.2L316.2 636.6L322.1 631L320 625.5L323.8 616.1L320.7 611.1Z"},{"n":"Trento","a":"TN","r":"Trentino-Alto Adige/Südtirol","lat":46.11,"c":[230.8,63.3],"b":[193.0,35.9,75.0,56.7],"d":"M228 89.6L233.8 76.1L245.4 69.9L255.1 71.5L255 64.3L265.6 62.3L268 56.9L261.6 45.5L262.4 35.9L252.2 38.4L244.7 45.7L231 55.5L228.8 50.6L231.7 39.2L218.9 37.7L201.5 40L196.2 47.1L199.7 53.5L193 72L198.6 85.1L212.5 81.8L212.7 89.5L217.7 92.6L227.6 91L228 89.6Z"},{"n":"Treviso","a":"TV","r":"Veneto","lat":45.76,"c":[281.5,86.8],"b":[260.9,67.6,44.0,32.5],"d":"M262.1 91.7L268.6 96.7L275.7 97.7L293.4 100.1L293.1 94.9L304.9 89.7L304.4 84.5L292.5 74L291.2 67.6L268.6 74L260.9 78.5L262.1 91.7Z"},{"n":"Trieste","a":"TS","r":"Friuli-Venezia Giulia","lat":45.72,"c":[357.5,89.7],"b":[350.8,83.5,17.0,15.2],"d":"M350.8 85.3L359.5 92.1L360.9 98.7L367.8 95.5L361.3 87.7L351.6 83.5L350.8 85.3Z"},{"n":"Udine","a":"UD","r":"Friuli-Venezia Giulia","lat":46.16,"c":[331.3,59.4],"b":[296.2,27.4,61.3,67.2],"d":"M342.6 87.9L341.5 76.6L346.6 66.9L355 58.2L342 53.9L343.6 46.3L356 40.7L357.5 34.9L340.3 31.1L308 27.4L302.8 36.4L296.2 42.4L303.2 47.4L319.5 47.6L317.2 76.2L320.4 81.7L326.6 94.6L333.9 89.5L342.6 87.9Z"},{"n":"Valle d'Aosta/Vallée d'Aoste","a":"AO","r":"Valle d'Aosta/Vallée d'Aoste","lat":45.72,"c":[41.5,89.6],"b":[9.0,72.0,57.1,34.6],"d":"M55.9 75.6L52 72L38.1 77.4L18.4 79.3L9 82.9L9.2 88.8L18.6 94.8L18.3 102.3L24.1 106.6L30 106.4L47.5 98.2L55.8 101L56 100.8L64 98.3L66.1 89.1L65.7 87.9L62.4 76.1L55.9 75.6Z"},{"n":"Varese","a":"VA","r":"Lombardia","lat":45.77,"c":[110.1,85.8],"b":[98.0,63.8,24.5,36.6],"d":"M104.9 100.4L109.9 97.5L122.4 96L122.5 94.4L117.3 89.8L115.3 81.9L115.9 76.8L105.3 63.8L105.9 69.2L98 77.8L99.2 82.1L104.9 100.4Z"},{"n":"Venezia","a":"VE","r":"Veneto","lat":45.49,"c":[292.7,105.3],"b":[269.5,80.3,57.1,54.2],"d":"M275.7 97.7L270 110.7L280.8 122.4L269.9 125.6L269.5 129.2L277.9 134.5L287.8 127.3L286.1 121.6L291.3 109.2L307.3 102.7L316.8 96.8L326.6 94.6L320.4 81.7L310.4 80.3L304.4 84.5L304.9 89.7L293.1 94.9L293.4 100.1L275.7 97.7Z"},{"n":"Verbano-Cusio-Ossola","a":"VB","r":"Piemonte","lat":46.04,"c":[84.8,67.9],"b":[63.0,40.2,42.9,45.7],"d":"M69.9 69.6L63 75.4L67.4 77.2L79.8 74.2L86.9 85.9L90.5 82L99.2 82.1L98 77.8L105.9 69.2L105.3 63.8L100.1 62.2L90.8 50.2L92.7 40.2L73.3 52.7L77.6 58.1L70.9 63.8L69.9 69.6Z"},{"n":"Vercelli","a":"VC","r":"Piemonte","lat":45.55,"c":[76.4,101.0],"b":[62.4,74.2,34.5,52.7],"d":"M65.7 87.9L66.1 89.1L75.5 86.9L82.9 92L84.2 100.7L75.5 112.8L70.6 111L68.8 117.7L68.8 118.1L68.8 122.8L76.9 126.9L93 124.4L96.9 126.9L95.2 117L89.7 109.9L86.9 85.9L79.8 74.2L67.4 77.2L63 75.4L62.4 76.1L65.7 87.9Z"},{"n":"Verona","a":"VR","r":"Veneto","lat":45.4,"c":[224.4,111.0],"b":[201.9,81.8,43.3,52.6],"d":"M237.3 112L236.8 104.4L227.6 91L217.7 92.6L212.7 89.5L212.5 81.8L201.9 97.5L203.2 110.1L207 116.9L217.4 122.5L222.6 130.6L231 130.9L238.8 134.4L241.6 129.5L245.2 120.3L237.3 112Z"},{"n":"Vibo Valentia","a":"VV","r":"Calabria","lat":38.62,"c":[482.9,571.5],"b":[464.1,558.5,30.4,25.3],"d":"M494 575.9L494.5 575.2L489.4 569.9L491.5 563.1L483.6 558.5L478.2 565.2L472.2 564.4L464.1 571.2L468.7 579.1L476.9 575.4L487.7 583.8L494 575.9Z"},{"n":"Vicenza","a":"VI","r":"Veneto","lat":45.63,"c":[246.2,95.8],"b":[227.6,69.9,34.5,50.4],"d":"M251.5 116.2L258.1 106.3L253.1 97.8L262.1 91.7L260.9 78.5L255.1 71.5L245.4 69.9L233.8 76.1L228 89.6L227.6 91L236.8 104.4L237.3 112L245.2 120.3L251.5 116.2Z"},{"n":"Viterbo","a":"VT","r":"Lazio","lat":42.46,"c":[268.7,310.5],"b":[243.3,285.3,54.0,46.7],"d":"M258.2 288.6L261.9 291.5L255.2 302.3L250.3 303.2L246.9 312.5L243.3 316.4L252.5 321.9L257.6 331.2L265.9 325.9L271.2 331.2L281.9 329.3L287.7 332.1L297.3 322L293.5 314.9L286.2 308.9L286.3 308.6L281 296.9L272.6 297.8L265.8 285.3L258.2 288.6Z"}];
+var DEF={prov:"Brescia",potImp:3,roofOn:false,roofBatt:0,roof:{img:"",w:800,h:500,scale:25,panels:[],tilt:"incl",az:180,outline:[],closed:false,side:0,type:"lungo",view:"disegno",multi:false,faces:[],cur:[],north:0},billFound:"",f1share:"",orient:"sud",ombre:"no",cons:4000,pres:"media",prezzo:0.28,imm:"princ",anno:"2026",
+  resa:"",autoD:"",infl:2,rid:0.08,man:120,invA:12,invC:1200,batA:13,batC:400,irpef:"",
+  A_on:true,A_nome:"Preventivo A",A_prezzo:9500,A_kw:6,A_batt:0,A_promT:"anni",A_prom:6,A_autoV:"",A_battC:"",A_fin:false,A_rata:"",A_mesi:"",A_garInv:10,A_ass:0,A_cl:[],A_found:"",
+  B_on:true,B_nome:"Preventivo B",B_prezzo:17500,B_kw:6,B_batt:10,B_promT:"anni",B_prom:5,B_autoV:80,B_battC:"",B_fin:false,B_rata:"",B_mesi:"",B_garInv:10,B_ass:0,B_cl:[],B_found:"",
+  C_on:false,C_nome:"Preventivo C",C_prezzo:12000,C_kw:4.5,C_batt:5,C_promT:"risp",C_prom:1400,C_autoV:"",C_battC:"",C_fin:true,C_rata:180,C_mesi:84,C_garInv:10,C_ass:0,C_cl:[],C_found:"",
+  D_on:false,D_nome:"Preventivo D",D_prezzo:11000,D_kw:6,D_batt:0,D_promT:"anni",D_prom:6,D_autoV:"",D_battC:"",D_fin:false,D_rata:"",D_mesi:"",D_garInv:10,D_ass:0,D_cl:[],D_found:""};
+
+var $=function(id){return document.getElementById(id);};
+function numDec(v){if(v===""||v==null)return NaN;var s=String(v).trim();if(s.indexOf(",")>-1)s=s.replace(/\./g,"").replace(",",".");return parseFloat(s);}
+var fE=new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",maximumFractionDigits:0,useGrouping:"always"});
+var fE2=new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",minimumFractionDigits:2,maximumFractionDigits:2,useGrouping:"always"});
+var fN=new Intl.NumberFormat("it-IT",{maximumFractionDigits:0,useGrouping:"always"});
+var fN1=new Intl.NumberFormat("it-IT",{maximumFractionDigits:1,minimumFractionDigits:0});
+var fK=new Intl.NumberFormat("it-IT",{minimumFractionDigits:3,maximumFractionDigits:3});
+function eur(x){return fE.format(Math.round(x));}
+function eur2(x){return fE2.format(x);}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];});}
+function calcBox(t){return '<details class="calc"><summary>Mostra il calcolo</summary><pre>'+esc(t)+'</pre></details>';}
+function anni(n){return n===1?"1 anno":fN.format(n)+" anni";}
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+
+/* ---------- province e producibilità ---------- */
+function provObj(){var n=S.prov;for(var i=0;i<PROV.length;i++)if(PROV[i].n===n)return PROV[i];return PROV[0];}
+function provYield(){var p=provObj();return Math.round((1550-(p.lat-37)*42)/10)*10;}
+$("prov").innerHTML=PROV.map(function(p){return '<option value="'+esc(p.n)+'">'+esc(p.n)+' ('+p.a+')</option>';}).join("");
+
+/* ---------- modulo dei preventivi ---------- */
+function offerHTML(k){
+  return '<fieldset id="fs'+k+'"><legend><label><input type="checkbox" data-k="'+k+'_on"> <span class="chipk" style="background:var(--p'+k+')">'+k+'</span> <span id="lg'+k+'">Preventivo '+k+'</span></label></legend><div class="fbody">'+
+  '<label class="mini">Carica il PDF di questo preventivo<input type="file" accept="application/pdf,.pdf" data-pdf="'+k+'" hidden></label><div class="found" id="found'+k+'"></div>'+
+  '<div class="f"><label for="'+k+'_nome">Nome</label><input id="'+k+'_nome" data-k="'+k+'_nome" style="text-align:left"></div>'+
+  '<div class="f"><label for="'+k+'_prezzo">Prezzo totale IVA inclusa (€)</label><input id="'+k+'_prezzo" inputmode="decimal" data-k="'+k+'_prezzo"></div>'+
+  '<div class="f"><label for="'+k+'_kw">Potenza (kW)</label><input id="'+k+'_kw" inputmode="decimal" data-k="'+k+'_kw"></div>'+
+  '<div class="f"><label for="'+k+'_batt">Batteria (kWh, 0 se assente)</label><input id="'+k+'_batt" inputmode="decimal" data-k="'+k+'_batt"></div>'+
+  '<div class="f"><label for="'+k+'_promT">Il venditore promette</label><select id="'+k+'_promT" data-k="'+k+'_promT"><option value="anni">rientro in anni</option><option value="risp">risparmio annuo in €</option></select></div>'+
+  '<div class="f"><label for="'+k+'_prom" id="lp'+k+'">Valore promesso</label><input id="'+k+'_prom" inputmode="decimal" data-k="'+k+'_prom"></div>'+
+  '<div class="f xp"><label for="'+k+'_autoV">Autoconsumo dichiarato (%)</label><input id="'+k+'_autoV" inputmode="decimal" data-k="'+k+'_autoV" placeholder="non indicato"></div>'+
+  '<div class="f xp"><label for="'+k+'_battC">Di cui batteria (€)</label><input id="'+k+'_battC" inputmode="decimal" data-k="'+k+'_battC" placeholder="non separato"></div>'+
+  '<div class="f xp"><label for="'+k+'_garInv">Garanzia inverter (anni)</label><input id="'+k+'_garInv" inputmode="numeric" data-k="'+k+'_garInv"></div>'+
+  '<div class="f xp"><label for="'+k+'_ass">Assicurazione (€ l’anno)</label><input id="'+k+'_ass" inputmode="decimal" data-k="'+k+'_ass"></div>'+
+  '<label class="check xp"><input type="checkbox" data-k="'+k+'_fin"> Pagato con un finanziamento</label>'+
+  '<div class="f xp fin'+k+'"><label for="'+k+'_rata">Rata mensile (€)</label><input id="'+k+'_rata" inputmode="decimal" data-k="'+k+'_rata"></div>'+
+  '<div class="f xp fin'+k+'"><label for="'+k+'_mesi">Numero di rate</label><input id="'+k+'_mesi" inputmode="numeric" data-k="'+k+'_mesi"></div>'+
+  '</div></fieldset>';
+}
+$("offers").innerHTML=KEYS.map(offerHTML).join("");
+
+/* ---------- stato ---------- */
+var S=load(),levels={};
+function load(){try{var r=localStorage.getItem(KEY);if(r){var d=JSON.parse(r),o={};for(var k in DEF)o[k]=(k in d)?d[k]:DEF[k];o.lv=d.lv||"rapida";return o;}}catch(e){}var o2=JSON.parse(JSON.stringify(DEF));o2.lv="rapida";return o2;}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function fill(){document.querySelectorAll("[data-k]").forEach(function(el){var k=el.dataset.k;if(el.type==="checkbox")el.checked=!!S[k];else el.value=(typeof S[k]==="number")?String(S[k]).replace(".",","):S[k];});setLv(S.lv);}
+function setLv(lv){S.lv=lv;document.body.classList.remove("lv-rapida","lv-esperta");document.body.classList.add("lv-"+lv);
+  document.querySelectorAll(".levels button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.lv===lv?"true":"false");});}
+function readField(el){var k=el.dataset.k;if(el.type==="checkbox")S[k]=el.checked;else if(el.tagName==="SELECT"||k.slice(-5)==="_nome")S[k]=el.value;else{var v=numDec(el.value);S[k]=el.value.trim()===""?"":(isNaN(v)?S[k]:v);}}
+function V(k){var v=S[k];return (v===""||v==null||isNaN(v))?0:+v;}
+function X(k){if(S.lv==="rapida")return DEF[k];return S[k];}
+function XV(k){var v=X(k);return (v===""||v==null||isNaN(v))?NaN:+v;}
+
+/* ---------- motore ---------- */
+function compute(){
+  var zona=S.zona,resa=isNaN(XV("resa"))||XV("resa")<=0?provYield():XV("resa"),fo=roofActive()?roofFactor():(ORIENT[S.orient]||1),fs=OMBRE[S.ombre]||1;
+  var cons=V("cons"),p=V("prezzo"),infl=XV("infl")/100,rid=XV("rid"),man=XV("man"),invA=XV("invA"),invC=XV("invC"),batA=XV("batA"),batC=XV("batC");
+  var autoDir=!isNaN(XV("autoD"))&&XV("autoD")>0?XV("autoD")/100:PRES[S.pres],autoDirAuto=isNaN(XV("autoD"))||XV("autoD")<=0;
+  var aliq=(ALIQ[S.anno]||ALIQ["2026"])[S.imm]||0.5,aliqAlt=(ALIQ[S.anno==="2026"?"2027":"2026"])[S.imm];
+  var irpef=XV("irpef");
+  var R={resa:resa,fo:fo,fs:fs,cons:cons,p:p,infl:infl,rid:rid,man:man,invA:invA,invC:invC,batA:batA,batC:batC,autoDir:autoDir,autoDirAuto:autoDirAuto,aliq:aliq,aliqAlt:aliqAlt,irpef:irpef,list:[],o:{}};
+  KEYS.forEach(function(k){
+    if(!S[k+"_on"]||!(V(k+"_prezzo")>0)||!(V(k+"_kw")>0))return;
+    var price=V(k+"_prezzo"),kw=V(k+"_kw"),batt=V(k+"_batt"),fin=S.lv!=="rapida"&&!!S[k+"_fin"],rata=V(k+"_rata"),mesi=Math.round(V(k+"_mesi"));
+    var garInv=S.lv==="rapida"?DEF[k+"_garInv"]:V(k+"_garInv"),ass=S.lv==="rapida"?0:V(k+"_ass");
+    var detrY=price*aliq/10,detrLost=0;if(!isNaN(irpef)&&irpef>=0&&detrY>irpef){detrLost=detrY-irpef;detrY=irpef;}
+    var cum=fin?0:-price,pay=null,rows=[],totProd=0,totCost=fin?0:price,totDetr=0,totAuto=0,totImm=0,invPaid=0,batPaid=0,finPaid=0,y1=null;
+    for(var t=1;t<=YEARS;t++){
+      var prod=kw*resa*fo*fs*Math.pow(1-DEGR,t-1);
+      var direct=Math.min(prod*autoDir,cons*0.6);
+      var shift=batt>0?Math.max(0,Math.min(batt*BATT_EFF*CYCLES,prod-direct,(cons-direct)*0.85)):0;
+      var auto=direct+shift*BATT_EFF,imm=prod-direct-shift;
+      var pt=p*Math.pow(1+infl,t-1),risp=auto*pt,vend=imm*rid,detr=t<=10?detrY:0;
+      var cost=man+ass;
+      if(t===invA&&garInv<invA){cost+=invC;invPaid+=invC;}
+      if(batt>0&&t===batA){cost+=batt*batC;batPaid+=batt*batC;}
+      var fp=0;if(fin){var m0=(t-1)*12,mm=Math.max(0,Math.min(12,mesi-m0));fp=mm*rata;finPaid+=fp;}
+      cum+=risp+vend+detr-cost-fp;totProd+=prod;totCost+=cost+fp;totDetr+=detr;totAuto+=auto;totImm+=imm;
+      if(t===1)y1={prod:prod,direct:direct,shift:shift,auto:auto,imm:imm,risp:risp,vend:vend,detr:detr,cost:cost,fp:fp};
+      rows.push({t:t,prod:prod,auto:auto,imm:imm,risp:risp,vend:vend,detr:detr,cost:cost,fp:fp,cum:cum});
+      if(pay===null&&cum>=0)pay=t;
+    }
+    var promT=S[k+"_promT"],prom=V(k+"_prom"),promY=promT==="anni"?prom:(prom>0?price/prom:NaN);
+    var o={k:k,nome:(S[k+"_nome"]||("Preventivo "+k)).trim()||("Preventivo "+k),price:price,kw:kw,batt:batt,fin:fin,rata:rata,mesi:mesi,finPaid:finPaid,
+      eurKw:kw>0?price/kw:NaN,rows:rows,y1:y1,pay:pay,net:cum,totProd:totProd,totDetr:totDetr,detrY:detrY,detrLost:detrLost,
+      lcoe:totProd>0?(totCost-totDetr)/totProd:NaN,autoPct:y1&&y1.prod>0?y1.auto/y1.prod*100:0,copPct:cons>0&&y1?y1.auto/cons*100:0,
+      promT:promT,prom:prom,promY:promY,autoV:S.lv==="rapida"?NaN:XVo(k+"_autoV"),battC:S.lv==="rapida"?NaN:XVo(k+"_battC"),invPaid:invPaid,batPaid:batPaid,garInv:garInv,ass:ass};
+    o.fuffa=(o.pay?o.pay:YEARS+1)-(isNaN(promY)?(o.pay||0):Math.ceil(promY));
+    R.list.push(o);R.o[k]=o;
+  });
+  /* valore della batteria: stesso impianto senza batteria */
+  R.list.forEach(function(o){if(o.batt<=0)return;var sim=simNoBatt(R,o);o.battVal=sim;});
+  var s=R.list.slice().sort(function(a,b){var pa=a.pay||99,pb=b.pay||99;return pa!==pb?pa-pb:b.net-a.net;});R.sorted=s;R.best=s[0];
+  return R;
+}
+function XVo(k){var v=S[k];return (v===""||v==null||isNaN(v))?NaN:+v;}
+function simNoBatt(R,o){
+  var extraAuto=0,extraVal=0;
+  for(var t=1;t<=YEARS;t++){var prod=o.kw*R.resa*R.fo*R.fs*Math.pow(1-DEGR,t-1),direct=Math.min(prod*R.autoDir,R.cons*0.6);
+    var shift=Math.max(0,Math.min(o.batt*BATT_EFF*CYCLES,prod-direct,(R.cons-direct)*0.85));var gain=shift*BATT_EFF*R.p*Math.pow(1+R.infl,t-1)-shift*R.rid;
+    extraVal+=gain;if(t===1)extraAuto=shift*BATT_EFF;}
+  var cost=!isNaN(o.battC)&&o.battC>0?o.battC:o.batt*1100,stim=!(!isNaN(o.battC)&&o.battC>0);
+  var detr=cost*R.aliq,repl=R.batA<=YEARS?o.batt*R.batC:0;
+  return {extraAuto:extraAuto,y1Gain:extraAuto*R.p-extraAuto/BATT_EFF*R.rid,val25:extraVal,cost:cost,stim:stim,detr:detr,repl:repl,net:extraVal+detr-cost-repl};
+}
+
+
+
+
+
+/* ---------- Indice di Fuffa ---------- */
+function filtro(o){
+  if(o.promT==="anni"){if(!(o.prom>0))return null;var real=o.pay||30;return Math.max(0,1-o.prom/real);}
+  if(!(o.prom>0))return null;var tot=0;for(var t=0;t<10;t++){var r=o.rows[t];tot+=r.risp+r.vend+r.detr-r.cost-r.fp;}return Math.max(0,Math.min(1,1-tot/10/o.prom));
+}
+function verdOf(f){if(f===null)return {t:"Nessuna promessa da verificare",c:"mid"};if(f<0.15)return {t:"Collaudo superato",c:"ok"};if(f<0.35)return {t:"Collaudo con riserva",c:"mid"};return {t:"Collaudo fallito",c:"ko"};}
+
+function ritocchi(R,o){
+  var r=[];
+  if(!isNaN(o.promY)){var py=Math.ceil(o.promY);if((o.pay||99)>py)r.push({e:null,t:"Il rientro",p:"Promesso in "+anni(py)+(o.promT==="risp"?" (prezzo diviso il risparmio promesso di "+eur(o.prom)+" l’anno)":"")+", reale "+(o.pay?"in "+anni(o.pay):"oltre i 25 anni")+"."});}
+  if(!isNaN(o.autoV)&&o.autoV>o.autoPct)r.push({e:(o.autoV-o.autoPct)/100*o.y1.prod*(R.p-R.rid),t:"L’autoconsumo gonfiato",p:"Dichiarato "+fN.format(o.autoV)+"%, con la tua presenza in casa è circa "+fN.format(o.autoPct)+"%. Il primo anno la differenza vale questa cifra."});
+  else if(isNaN(o.autoV))r.push({e:null,t:"L’autoconsumo non dichiarato",p:"Il preventivo non dice quanta energia userai davvero. Con la tua presenza in casa è circa il "+fN.format(o.autoPct)+"%: chiedi su quale ipotesi hanno calcolato il risparmio."});
+  r.push({e:o.y1.imm*(R.p-R.rid),t:"L’energia regalata alla rete",p:"Il primo anno mandi in rete "+fN.format(o.y1.imm)+" kWh pagati "+eur2(R.rid)+" l’uno, che la sera ricompri a "+eur2(R.p)+". Questa è la differenza."});
+  if(o.totDetr>0)r.push({e:null,t:"La detrazione non è uno sconto",p:eur(o.totDetr)+" in tutto, ma in 10 rate da "+eur(o.detrY)+" l’anno, con la dichiarazione dei redditi."+(o.detrLost>0?" Con le tue imposte ne perdi "+eur(o.detrLost)+" l’anno.":"")});
+  if(o.battVal&&o.battVal.net<0)r.push({e:-o.battVal.net,t:"La batteria",p:"Costa"+(o.battVal.stim?" (stimato)":"")+" "+eur(o.battVal.cost)+" più la sostituzione, e in 25 anni ti fa risparmiare meno di quanto costa."});
+  if(o.invPaid>0)r.push({e:o.invPaid,t:"L’inverter da cambiare",p:"Intorno all’anno "+R.invA+", fuori dalla garanzia di "+anni(o.garInv)+"."});
+  if(o.fin&&o.mesi>0){var m1=(o.y1.risp+o.y1.vend+o.y1.detr)/12,gap=o.rata-m1;if(gap>0)r.push({e:gap*12,t:"La rata non la paga il sole",p:"Rata "+eur(o.rata)+" al mese, il sole ne copre "+eur(m1)+": ci metti tu "+eur(gap)+" al mese, cioè questa cifra il primo anno."});}
+  (S[o.k+"_cl"]||[]).forEach(function(c){r.push({e:null,t:c.t,p:c.p,q:c.q,cl:true});});
+  return r;
+}
+
+
+/* ================= SIMULATORE DELLA GIORNATA ================= */
+var SEASON={estate:{f:1.42,len:15},mezze:{f:1.0,len:12},inverno:{f:0.46,len:9.2}};
+var APPS=[
+  {k:"lav",n:"Lavatrice",p:0.9,m:90},{k:"asc",n:"Asciugatrice",p:2.2,m:90},{k:"lvs",n:"Lavastoviglie",p:1.1,m:120},
+  {k:"for",n:"Forno",p:2.0,m:60},{k:"ind",n:"Piano a induzione",p:2.5,m:45},{k:"mic",n:"Microonde",p:1.0,m:10},
+  {k:"pho",n:"Asciugacapelli",p:1.8,m:10},{k:"cli",n:"Climatizzatore",p:1.0,m:0},{k:"pdc",n:"Scaldabagno elettrico",p:1.2,m:120},
+  {k:"eva",n:"Auto elettrica",p:3.7,m:240}];
+var SIM={t:720,play:false,season:"mezze",mode:"realta",offer:null,apps:{},step:"italia"};
+function simOffer(R){if(SIM.offer==="T"&&roofActive()&&activePanels().length){var n=activePanels().length;return {k:"T",nome:"Il mio tetto ("+n+" pannelli)",kw:n*PANEL_KW,batt:V("roofBatt")};}var o=R.o[SIM.offer];if(!o){o=R.list[0];SIM.offer=o?o.k:null;}return o;}
+/* curva di produzione normalizzata (somma = 1 sui minuti del giorno) */
+var curveCache={};
+function curve(season,panels){
+  if(panels||roofActive())return roofCurve(season,panels||activePanels());
+  var key=season+"|"+S.orient+"|"+S.ombre+"|"+S.prov;if(curveCache[key])return curveCache[key];
+  var p=provObj(),sd=SEASON[season],len=sd.len+(season==="estate"?(p.lat-42)*0.12:(season==="inverno"?-(p.lat-42)*0.12:0));
+  var mid=13*60+(S.orient==="sudest"?-30:0),sr=mid-len*30,ss=mid+len*30,exp=S.orient==="estovest"?1.0:1.6,a=new Float32Array(1440),tot=0;
+  for(var m=0;m<1440;m++){if(m<=sr||m>=ss)continue;var x=(m-sr)/(ss-sr),v=Math.pow(Math.sin(Math.PI*x),exp);
+    if(S.ombre==="poche"&&m<sr+120)v*=0.55;if(S.ombre==="molte"&&(m<sr+180||m>ss-120))v*=0.45;a[m]=v;tot+=v;}
+  for(m=0;m<1440;m++)a[m]/=tot;a.sr=sr;a.ss=ss;curveCache[key]=a;return a;
+}
+/* consumo di base (kW per minuto) dal consumo annuo e dalla presenza in casa */
+function baseLoad(m){
+  var h=m/60,day=V("cons")*0.62/365,mid=S.pres==="poca"?0.35:(S.pres==="media"?0.7:1.0);
+  var w=0.55+(h>=6.5&&h<9?1.6:0)+(h>=9&&h<17?0.9*mid:0)+(h>=17&&h<19?1.2:0)+(h>=19&&h<23?2.1:0)+(h>=23||h<6.5?0:0);
+  return w*day/BASEW;
+}
+var BASEW=(function(){var s=0;for(var m=0;m<1440;m++){var h=m/60;s+=0.55+(h>=6.5&&h<9?1.6:0)+(h>=9&&h<17?0.9:0)+(h>=17&&h<19?1.2:0)+(h>=19&&h<23?2.1:0);}return s/60;})();
+function appLoad(m){var t=0;APPS.forEach(function(a){var s=SIM.apps[a.k];if(s==null)return;if(a.m===0){if(m>=s)t+=a.p;}else if(m>=s&&m<s+a.m)t+=a.p;});return t;}
+/* simula dalle 0:00 al minuto T e restituisce flussi istantanei e contatori */
+function simulate(R,o,T){
+  var res={prod:0,self:0,exp:0,imp:0,bin:0,bout:0,soc:0,flow:{pvHome:0,pvBatt:0,pvGrid:0,battHome:0,gridHome:0,pv:0,load:0}};
+  if(!o)return res;
+  var c=curve(SIM.season),dayE=o.kw*R.resa*R.fo*R.fs/365*SEASON[SIM.season].f,cap=o.batt*0.9,pmax=Math.max(1.5,o.batt*0.5),soc=cap*(SIM.season==="estate"?0.35:0.2);
+  var prom=SIM.mode==="promessa";
+  for(var m=0;m<=T;m++){
+    var pv=c[m]*dayE*60,load=baseLoad(m)+appLoad(m);
+    if(prom){pv=pv*1.25;}
+    var f={pv:pv,load:load,pvHome:Math.min(pv,load),pvBatt:0,pvGrid:0,battHome:0,gridHome:0};
+    var sur=pv-f.pvHome,def=load-f.pvHome;
+    if(prom){f.pvHome=load;f.gridHome=0;f.pvBatt=cap>0?Math.min(Math.max(0,pv-load),pmax):0;f.pvGrid=0;soc=cap;}
+    else{
+      if(sur>0){var room=(cap-soc)*60/0.95;f.pvBatt=Math.max(0,Math.min(sur,pmax,room));soc+=f.pvBatt*0.95/60;f.pvGrid=sur-f.pvBatt;}
+      if(def>0){var av=Math.max(0,soc-cap*0.1)*60;f.battHome=Math.min(def,pmax,av);soc-=f.battHome/60;f.gridHome=def-f.battHome;}
+    }
+    res.prod+=pv/60;res.self+=(f.pvHome+f.battHome)/60;res.exp+=f.pvGrid/60;res.imp+=f.gridHome/60;res.bin+=f.pvBatt/60;res.bout+=f.battHome/60;
+    if(m===T)res.flow=f;
+  }
+  res.soc=cap>0?soc/cap:0;res.cap=cap;res.sr=c.sr;res.ss=c.ss;
+  res.save=res.self*R.p+res.exp*R.rid;return res;
+}
+
+/* ---------- disegni ---------- */
+var NS="http://www.w3.org/2000/svg";
+function mapSVG(){
+  var p=provObj(),h='<defs><radialGradient id="mglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFB000" stop-opacity=".45"/><stop offset="1" stop-color="#FFB000" stop-opacity="0"/></radialGradient></defs>';
+  h+='<rect x="-400" y="-400" width="1400" height="1500" fill="'+css("--soft")+'"/>';
+  PROV.forEach(function(q){var on=q.n===p.n;h+='<path d="'+q.d+'" fill="'+(on?"#FFB000":css("--paper"))+'" stroke="'+(on?"#B45309":css("--muted"))+'" stroke-width="'+(on?1.2:0.45)+'" opacity="'+(on?1:0.95)+'"><title>'+esc(q.n)+'</title></path>';});
+  h+='<circle cx="'+p.c[0]+'" cy="'+p.c[1]+'" r="38" fill="url(#mglow)"/><g transform="translate('+p.c[0]+' '+p.c[1]+')"><path d="M0 0 C-7 -10 -9 -14 -9 -18 A9 9 0 0 1 9 -18 C9 -14 7 -10 0 0Z" fill="#0E2A40"/><circle cy="-18" r="3.4" fill="#FFB000"/></g>';
+  h+='<g id="maplabel"><text x="'+(p.c[0]+(SIM.step==="prov"?5:12))+'" y="'+(p.c[1]-(SIM.step==="prov"?8:14))+'" font-family="IBM Plex Sans,Arial" font-size="'+(SIM.step==="prov"?6:15)+'" font-weight="700" fill="'+css("--ink")+'" paint-order="stroke" stroke="'+css("--soft")+'" stroke-width="4">'+esc(p.n)+'</text></g>';
+  $("map").innerHTML=h;
+}
+function setMapView(level,animate){
+  var p=provObj(),from=($("map").getAttribute("viewBox")||"0 0 600 702").split(" ").map(Number),to;
+  if(level==="italia")to=[0,0,600,702];
+  else{var b=p.b,pad=Math.max(b[2],b[3])*1.2+30,cx=b[0]+b[2]/2,cy=b[1]+b[3]/2,w=Math.max(b[2],b[3])+pad*2,hh=w*702/600;to=[cx-w/2,cy-hh/2,w,hh];}
+  var lab=$("maplabel");if(lab){var tx=lab.querySelector("text");tx.setAttribute("font-size",level==="italia"?"15":"6");tx.setAttribute("stroke-width",level==="italia"?"4":"1.6");tx.setAttribute("x",p.c[0]+(level==="italia"?12:5));tx.setAttribute("y",p.c[1]-(level==="italia"?14:8));}
+  if(!animate||reduceMotion()){$("map").setAttribute("viewBox",to.join(" "));return Promise.resolve();}
+  return new Promise(function(res){var t0=null,d=1100;function st(ts){if(t0===null)t0=ts;var k=Math.min(1,(ts-t0)/d),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+    $("map").setAttribute("viewBox",from.map(function(v,i){return (v+(to[i]-v)*e).toFixed(2);}).join(" "));if(k<1)requestAnimationFrame(st);else res();}requestAnimationFrame(st);});
+}
+function reduceMotion(){return window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;}
+
+/* fili: id, percorso, colore */
+var WIRES_H=[
+  ["h_pv","M600 232 L632 232 L632 470 L580 470","--solar","pv"],
+  ["h_home","M530 507 L530 528 L408 528 L408 396","--self","home"],
+  ["h_batt","M506 495 L480 495 L480 600 L420 600","--batt","batt"],
+  ["h_grid","M580 480 L830 480 M850 440 L850 250","--grid","grid"]];
+function sky(T,r){var day=T>r.sr&&T<r.ss,dusk=Math.min(Math.abs(T-r.sr),Math.abs(T-r.ss))<60;return day?(dusk?["#FFD7A8","#FCEFD9"]:["#9FD8F5","#E6F5FC"]):["#0F2236","#1C3653"];}
+function houseSVG(R,o,r,T){
+  var sk=sky(T,r),day=T>r.sr&&T<r.ss,prom=SIM.mode==="promessa";
+  var x=(T-r.sr)/(r.ss-r.sr),sx=120+760*x,sy=230-170*Math.sin(Math.PI*Math.max(0,Math.min(1,x)));
+  var nP=o?Math.max(4,Math.min(16,Math.round(o.kw/0.43))):8,h='';
+  h+='<defs><linearGradient id="hsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+sk[0]+'"/><stop offset="1" stop-color="'+sk[1]+'"/></linearGradient><linearGradient id="hpan" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2B5CC4"/><stop offset="1" stop-color="#173A82"/></linearGradient><radialGradient id="hsun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFE08A"/><stop offset=".55" stop-color="#FFB000"/><stop offset="1" stop-color="#FFB000" stop-opacity="0"/></radialGradient></defs>';
+  h+='<rect width="1000" height="420" fill="url(#hsky)"/>';
+  if(day)h+='<circle cx="'+sx.toFixed(1)+'" cy="'+sy.toFixed(1)+'" r="70" fill="url(#hsun)"/><circle cx="'+sx.toFixed(1)+'" cy="'+sy.toFixed(1)+'" r="24" fill="#FFC83D"/>';
+  else h+='<circle cx="830" cy="90" r="22" fill="#E8EEF6"/><circle cx="842" cy="82" r="20" fill="'+sk[0]+'"/>';
+  if(S.ombre!=="no"){var tr=S.ombre==="molte"?1:0.75;h+='<rect x="'+(268-8*tr)+'" y="'+(300-150*tr)+'" width="'+(16*tr)+'" height="'+(120+150*tr)+'" fill="#6B5240"/><circle cx="268" cy="'+(290-150*tr)+'" r="'+(70*tr)+'" fill="#4F7A4A"/><circle cx="305" cy="'+(320-130*tr)+'" r="'+(48*tr)+'" fill="#45703F"/>';}
+  /* terreno e interrato */
+  h+='<rect y="420" width="1000" height="280" fill="#C9B79C"/><rect y="420" width="1000" height="14" fill="#7FB069"/>';
+  h+='<rect x="300" y="434" width="320" height="226" fill="#E9E3D7" stroke="#0E2A40" stroke-width="3"/><text x="316" y="458" font-family="IBM Plex Mono,monospace" font-size="15" fill="#5A6B7B">PIANO INTERRATO</text>';
+  /* casa */
+  h+='<rect x="300" y="250" width="320" height="170" fill="#F7F4EE" stroke="#0E2A40" stroke-width="3"/><path d="M300 335 H620" stroke="#0E2A40" stroke-width="2"/>';
+  var lit=!day&&S.pres!=="poca"||(!day&&!prom);
+  [[330,272],[440,272],[540,272],[330,357],[540,357]].forEach(function(w){h+='<rect x="'+w[0]+'" y="'+w[1]+'" width="46" height="46" rx="3" fill="'+(day?"#BFE4F6":(lit?"#FFE6A3":"#2A3F55"))+'" stroke="#0E2A40" stroke-width="2.5"/>';});
+  h+='<rect x="436" y="350" width="48" height="70" rx="2" fill="#8C6A4F" stroke="#0E2A40" stroke-width="2.5"/>';
+  /* tetto con pannelli */
+  h+='<path d="M280 252 L460 120 L640 252 Z" fill="#B7563F" stroke="#0E2A40" stroke-width="3" stroke-linejoin="round"/>';
+  var shadeCut=S.ombre==="molte"?0.45:(S.ombre==="poche"?0.2:0),placed=0;
+  for(var row=0;row<3&&placed<nP;row++){var y0=158+row*30,xr=460+180*((y0+24)-120)/132-8,x=468;
+    while(x+30<=xr&&placed<nP){var sh=S.ombre!=="no"&&!prom&&placed<nP*shadeCut;
+      h+='<rect x="'+x.toFixed(1)+'" y="'+y0+'" width="30" height="24" rx="2" fill="url(#hpan)" stroke="#0E2A40" stroke-width="1.5" opacity="'+(sh?0.5:1)+'"/><path d="M'+(x+15).toFixed(1)+' '+y0+' V'+(y0+24)+' M'+x.toFixed(1)+' '+(y0+12)+' H'+(x+30).toFixed(1)+'" stroke="#7FA6E8" stroke-width="1"/>';
+      x+=34;placed++;}}
+  /* inverter, batteria, quadro, contatore, palo */
+  var soc=r.soc||0,cap=r.cap||0;
+  h+='<g><rect x="506" y="455" width="74" height="52" rx="6" fill="#DDE6EE" stroke="#0E2A40" stroke-width="2.5"/><text x="543" y="486" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="600" fill="#0E2A40">INVERTER</text></g>';
+  if(cap>0){h+='<g><rect x="330" y="560" width="90" height="80" rx="8" fill="#0E2A40"/><rect x="338" y="'+(568+64*(1-soc)).toFixed(1)+'" width="74" height="'+(64*soc).toFixed(1)+'" rx="4" fill="'+css("--batt")+'"/><text x="375" y="657" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" font-weight="600" fill="#0E2A40">BATTERIA '+Math.round(soc*100)+'%</text></g>';}
+  else h+='<text x="375" y="610" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" fill="#5A6B7B">nessuna batteria</text>';
+  h+='<rect x="390" y="372" width="36" height="24" rx="3" fill="#DDE6EE" stroke="#0E2A40" stroke-width="2"/><text x="408" y="410" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" fill="#0E2A40">QUADRO</text>';
+  h+='<rect x="830" y="440" width="40" height="56" rx="4" fill="#DDE6EE" stroke="#0E2A40" stroke-width="2"/><text x="850" y="514" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#0E2A40">CONTATORE</text>';
+  h+='<path d="M850 240 V430 M820 252 H880 M826 270 H874" stroke="#5A4A3A" stroke-width="7" stroke-linecap="round"/><text x="850" y="228" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="12" fill="'+(day?"#0E2A40":"#E7F0F7")+'">RETE</text>';
+  /* fili */
+  h+=wiresSVG(WIRES_H);
+  /* elettrodomestici accesi */
+  var on=APPS.filter(function(a){var s=SIM.apps[a.k];return s!=null&&(a.m===0?T>=s:(T>=s&&T<s+a.m));});
+  on.slice(0,6).forEach(function(a,i){h+='<g><rect x="'+(650+0)+'" y="'+(262+i*26)+'" width="150" height="22" rx="11" fill="#FFF3D6" stroke="#B45309" stroke-width="1.5"/><text x="725" y="'+(277+i*26)+'" text-anchor="middle" font-family="IBM Plex Sans,Arial" font-size="12" font-weight="600" fill="#7A3E00">'+esc(a.n)+' '+fN1.format(a.p)+' kW</text></g>';});
+  return h;
+}
+var WIRES_S=[
+  ["s_pv","M260 150 L485 150 L485 260","--solar","pv"],
+  ["s_home","M570 300 L820 300 L820 220","--self","home"],
+  ["s_batt","M485 410 L485 520","--batt","batt"],
+  ["s_gridout","M570 380 L870 380 L870 500","--grid","grid"]];
+function schemaSVG(R,o,r,T){
+  var f=r.flow||{},soc=r.soc||0,cap=r.cap||0,h='';
+  h+='<defs><filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0E2A40" flood-opacity=".14"/></filter><linearGradient id="span" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2B5CC4"/><stop offset="1" stop-color="#173A82"/></linearGradient></defs>';
+  h+='<rect width="1000" height="700" fill="'+css("--soft")+'"/>';
+  function node(x,y,w,hh,title,val,body){return '<g filter="url(#sh)"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+hh+'" rx="18" fill="'+css("--paper")+'" stroke="'+css("--line")+'" stroke-width="1.5"/></g><text x="'+(x+18)+'" y="'+(y+30)+'" font-family="IBM Plex Mono,monospace" font-size="13" letter-spacing="1.5" fill="'+css("--muted")+'">'+title+'</text><text x="'+(x+18)+'" y="'+(y+62)+'" font-family="IBM Plex Mono,monospace" font-size="26" font-weight="600" fill="'+css("--ink")+'">'+val+'</text>'+(body||"");}
+  var pvBody='';for(var i=0;i<6;i++){pvBody+='<rect x="'+(78+i*26)+'" y="152" width="22" height="34" rx="3" fill="url(#span)" stroke="#0E2A40" stroke-width="1"/>';}
+  h+=node(60,80,200,130,"PANNELLI",fN1.format(f.pv||0)+" kW",pvBody);
+  h+=node(400,260,170,150,"INVERTER",fN1.format((f.pv||0)+(f.battHome||0))+" kW",'<path d="M430 360 q10 -18 20 0 t20 0 t20 0 t20 0" fill="none" stroke="'+css("--muted")+'" stroke-width="2.5"/>');
+  var batBody=cap>0?'<rect x="420" y="586" width="130" height="34" rx="8" fill="'+css("--soft")+'" stroke="'+css("--line")+'"/><rect x="424" y="590" width="'+(122*soc).toFixed(1)+'" height="26" rx="6" fill="'+css("--batt")+'"/><text x="485" y="645" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" fill="'+css("--muted")+'">'+fN1.format(soc*cap)+' / '+fN1.format(cap)+' kWh</text>':'<text x="420" y="610" font-family="IBM Plex Sans,Arial" font-size="15" fill="'+css("--muted")+'">nessuna batteria</text>';
+  h+=node(400,520,170,150,"BATTERIA",cap>0?Math.round(soc*100)+"%":"—",batBody);
+  var on=APPS.filter(function(a){var s=SIM.apps[a.k];return s!=null&&(a.m===0?T>=s:(T>=s&&T<s+a.m));});
+  var homeBody='<text x="718" y="200" font-family="IBM Plex Sans,Arial" font-size="13" fill="'+css("--muted")+'">'+(on.length?esc(on.map(function(a){return a.n;}).join(", ")).slice(0,46):"consumo di base")+'</text>';
+  h+=node(700,90,240,130,"CASA",fN1.format(f.load||0)+" kW",homeBody);
+  h+=node(780,500,180,120,"RETE",(f.gridHome>0.01?"← "+fN1.format(f.gridHome):(f.pvGrid>0.01?"→ "+fN1.format(f.pvGrid):"0"))+" kW",'<text x="798" y="600" font-family="IBM Plex Sans,Arial" font-size="13" fill="'+css("--muted")+'">'+(f.gridHome>0.01?"stai comprando":(f.pvGrid>0.01?"stai regalando":"ferma"))+'</text>');
+  h+=wiresSVG(WIRES_S);
+  return h;
+}
+function wiresSVG(W){var h='';W.forEach(function(w){h+='<path d="'+w[1]+'" fill="none" stroke="'+css("--line")+'" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><path id="'+w[0]+'" d="'+w[1]+'" fill="none" stroke="'+css(w[2]==="--grid"?"--grid-in":w[2])+'" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 16" data-kind="'+w[3]+'" opacity="0"/>';});return h;}
+/* animazione dei flussi */
+var dash={},lastTs=null,lastSim=null;
+function wireState(kind,f){
+  if(kind==="pv")return {p:f.pv||0,c:"--solar",dir:1};
+  if(kind==="home")return {p:(f.pvHome||0)+(f.battHome||0),c:"--self",dir:1};
+  if(kind==="batt"){var c=(f.pvBatt||0)-(f.battHome||0);return {p:Math.abs(c),c:"--batt",dir:c>=0?1:-1};}
+  if(kind==="grid"){if((f.gridHome||0)>0.01)return {p:f.gridHome,c:"--grid-in",dir:-1};return {p:f.pvGrid||0,c:"--grid-out",dir:1};}
+  return {p:0,c:"--line",dir:1};
+}
+function tick(ts){
+  if(lastTs===null)lastTs=ts;var dt=Math.min(0.1,(ts-lastTs)/1000);lastTs=ts;
+  if(SIM.play){SIM.t+=dt*90;if(SIM.t>=1439){SIM.t=1439;SIM.play=false;$("bPlay").textContent="▶";}$("tSlider").value=Math.round(SIM.t);drawSim();}
+  var f=lastSim?lastSim.flow:{};
+  document.querySelectorAll("path[data-kind]").forEach(function(el){var st=wireState(el.dataset.kind,f);
+    if(st.p<0.02){el.setAttribute("opacity","0");return;}
+    el.setAttribute("opacity","1");el.setAttribute("stroke",css(st.c));el.setAttribute("stroke-width",(3+Math.min(6,st.p*1.4)).toFixed(1));
+    var id=el.id;dash[id]=((dash[id]||0)-st.dir*dt*(20+st.p*45))%1000;el.setAttribute("stroke-dashoffset",dash[id].toFixed(1));});
+  requestAnimationFrame(tick);
+}
+function hhmm(m){m=Math.round(m);return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");}
+function drawSim(){
+  var R=window.__last;if(!R)return;var o=simOffer(R),T=Math.round(SIM.t),r=simulate(R,o,T);lastSim=r;
+  $("clock").textContent=hhmm(T);
+  if(SIM.step==="casa")$("house").innerHTML=houseSVG(R,o,r,T);
+  if(SIM.step==="schema")$("schema").innerHTML=schemaSVG(R,o,r,T);
+  var p=provObj(),cap=SIM.step==="italia"?['Italia','Scegli la provincia: la produzione cambia con la latitudine']:(SIM.step==="prov"?[p.n+', '+p.r,'circa '+fN.format(provYield())+' kWh per kW all’anno (stima)']:[(o?o.nome+', '+fN1.format(o.kw)+' kW'+(o.batt>0?' + '+fN1.format(o.batt)+' kWh':''):'Nessun impianto'),(SIM.mode==="promessa"?'Come te l’hanno raccontato':'Simulazione realistica')+', '+$("season").selectedOptions[0].textContent.toLowerCase()]);
+  $("cap").innerHTML='<span>'+esc(cap[0])+'</span><span>'+esc(cap[1])+'</span>';
+  var M=[["Prodotta oggi",fN1.format(r.prod)+" kWh","--solar"],["Usata in casa",fN1.format(r.self)+" kWh","--self"],["Batteria",(r.cap>0?Math.round(r.soc*100)+"%":"assente"),"--batt"],["Regalata alla rete",fN1.format(r.exp)+" kWh","--grid-out"],["Comprata dalla rete",fN1.format(r.imp)+" kWh","--grid-in"],["Risparmio di oggi",eur2(r.save),"--self"]];
+  var potI=V("potImp")||3,over=(r.flow.gridHome||0)+(r.flow.battHome||0)+(r.flow.pvHome||0)>potI*1.1&&(r.flow.load||0)>potI*1.1&&(r.flow.gridHome||0)>0.01;
+  var potNote="";if(SIM.mode!=="promessa"&&(r.flow.load||0)>potI*1.1){var gh=r.flow.gridHome||0,lim=potI*1.1;
+    if(gh>lim){M.push(["Contatore","salta la corrente","--red"]);potNote='<div class="meter" style="grid-column:1/-1;border-color:var(--red);background:color-mix(in srgb,var(--red) 8%,var(--paper))"><small style="color:var(--red)">Salta la corrente</small><b style="font-size:1rem;font-family:inherit">La casa sta usando '+fN1.format(r.flow.load)+' kW. '+((r.flow.pvHome||0)+(r.flow.battHome||0)>0.05?'Sole e batteria ne coprono '+fN1.format((r.flow.pvHome||0)+(r.flow.battHome||0))+', ':'')+'dalla rete ne servirebbero '+fN1.format(gh)+', ma il tuo contatore da '+fN1.format(potI)+' kW regge circa '+fN1.format(lim)+' kW: dopo poco stacca. Accendi gli elettrodomestici più potenti uno alla volta.</b></div>';}
+    else{M.push(["Contatore","salvato da sole e batteria","--self"]);potNote='<div class="meter" style="grid-column:1/-1;border-color:var(--self)"><small style="color:var(--self)">Salvato da sole e batteria</small><b style="font-size:1rem;font-family:inherit">La casa sta usando '+fN1.format(r.flow.load)+' kW, più dei '+fN1.format(lim)+' kW che regge il tuo contatore da '+fN1.format(potI)+' kW. Senza pannelli e batteria salterebbe la corrente: qui ne coprono '+fN1.format((r.flow.pvHome||0)+(r.flow.battHome||0))+' kW e la rete resta sotto il limite.</b></div>';}}
+  $("meters").innerHTML=potNote+M.map(function(m){return '<div class="meter"><small><i style="background:var('+m[2]+')"></i>'+m[0]+'</small><b>'+m[1]+'</b></div>';}).join("")+(SIM.mode==="promessa"?'<div class="meter" style="grid-column:1/-1;border-color:var(--red)"><small style="color:var(--red)">Promessa</small><b style="font-size:1rem">Bolletta zero, batteria sempre piena, niente rete. Torna su “Realtà” per vedere la giornata vera.</b></div>':'');
+  $("apps").querySelectorAll(".app").forEach(function(b){var a=APPS.filter(function(x){return x.k===b.dataset.app;})[0],s=SIM.apps[a.k],on=s!=null&&(a.m===0?true:(T<s+a.m));b.setAttribute("aria-pressed",s!=null?"true":"false");
+    b.querySelector(".kw").textContent=fN1.format(a.p)+" kW"+(s!=null?(a.m===0?" · acceso dalle "+hhmm(s):" · "+hhmm(s)+"–"+hhmm(Math.min(1439,s+a.m))):(a.m?" · "+a.m+" min":" · finché acceso"));});
+}
+function setStep(step){
+  SIM.step=step;document.querySelectorAll(".steps button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.step===step?"true":"false");});
+  var mapOn=step==="italia"||step==="prov";
+  $("map").classList.toggle("hide",!mapOn);$("house").classList.toggle("hide",step!=="casa");$("schema").classList.toggle("hide",step!=="schema");
+  if(mapOn)setMapView(step,true);drawSim();
+}
+function fly(){mapSVG();setStep("italia");setTimeout(function(){setStep("prov");setTimeout(function(){setStep("casa");},reduceMotion()?0:1500);},reduceMotion()?0:500);}
+
+/* ---------- rendering dei risultati ---------- */
+function render(){
+  var R=compute(),L=R.list,h;window.__last=R;
+  L.forEach(function(o){o.filtro=filtro(o);});
+  KEYS.forEach(function(k){$("found"+k).innerHTML=S[k+"_found"]||"";$("fs"+k).classList.toggle("off",!S[k+"_on"]);$("lg"+k).textContent=(S[k+"_nome"]||"Preventivo "+k);
+    $("lp"+k).textContent=S[k+"_promT"]==="anni"?"Rientro promesso (anni)":"Risparmio promesso (€ l’anno)";
+    document.querySelectorAll(".fin"+k).forEach(function(e){e.style.display=S[k+"_fin"]?"":"none";});});
+  if(S.billFound&&!$("billFound").innerHTML)$("billFound").innerHTML=S.billFound;
+  var p=provObj();$("provNote").textContent=p.r+", latitudine "+fN1.format(p.lat)+"°: circa "+fN.format(provYield())+" kWh per kW all’anno (stima per tetto a sud senza ombre).";
+  var mesi=Math.floor((Date.now()-AGG.date.getTime())/(1000*60*60*24*30.44));
+  $("stale").textContent=mesi>=AGG.staleMonths?"Attenzione: sono passati circa "+mesi+" mesi dall’ultimo aggiornamento. Detrazioni, prezzi e regole potrebbero essere cambiati.":"";
+  $("simOffer").innerHTML=L.map(function(o){return '<option value="'+o.k+'"'+(o.k===SIM.offer?' selected':'')+'>'+esc(o.nome)+'</option>';}).join("")+(roofActive()&&activePanels().length?'<option value="T"'+(SIM.offer==="T"?' selected':'')+'>Il mio tetto ('+activePanels().length+' pannelli)</option>':'');
+  if(!L.length){$("offersOut").innerHTML='<p>Trascina il PDF di un preventivo nel riquadro a sinistra, oppure inserisci almeno prezzo e potenza.</p>';["rank","sAsk","sBatt","sYears","sDice"].forEach(function(id){$(id).innerHTML="";});$("big").innerHTML='<div class="l">Nuova valutazione<small>Carica un preventivo per misurare l’Indice di Fuffa.</small></div>';$("verdict").textContent="";$("verdict2").textContent="";drawSim();return;}
+  simOffer(R);
+  var withF=L.filter(function(o){return o.filtro!==null;}).sort(function(a,b){return b.filtro-a.filtro;});
+  if(withF.length){var w=withF[0];$("big").innerHTML='<div class="n">'+Math.round(w.filtro*100)+'%</div><div class="l">Indice di Fuffa di '+esc(w.nome)+'<small>'+(w.promT==="anni"?'Rientro promesso in '+anni(Math.ceil(w.promY))+', reale '+(w.pay?'in '+anni(w.pay):'oltre i 25 anni'):'Risparmio promesso '+eur(w.prom)+' l’anno, reale molto meno')+'.</small></div>';}
+  else $("big").innerHTML='<div class="l">Indice di Fuffa<small>Inserisci la promessa del venditore per misurarlo.</small></div>';
+  /* schede */
+  $("offersOut").innerHTML=L.map(function(o){var v=verdOf(o.filtro),rt=ritocchi(R,o);
+    var pv={y:!isNaN(o.promY)?Math.ceil(o.promY):null,a:!isNaN(o.autoV)?o.autoV:null};
+    return '<article class="oc"><div class="oc-h"><span class="chipk" style="background:var(--p'+o.k+')">'+o.k+'</span><div><b>'+esc(o.nome)+'</b><small>'+eur(o.price)+', '+fN1.format(o.kw)+' kW'+(o.batt>0?' + batteria '+fN1.format(o.batt)+' kWh':'')+'</small></div></div>'+
+      '<div class="idx"><span class="n" style="color:'+(o.filtro===null?"var(--muted)":(o.filtro>=0.35?"var(--red)":(o.filtro>=0.15?"var(--solar)":"var(--self)")))+'">'+(o.filtro===null?"–":Math.round(o.filtro*100)+"%")+'</span><span class="l">Indice di Fuffa</span></div>'+
+      '<div class="pr"><span class="h"></span><span class="h" style="text-align:right">Promessa</span><span class="h" style="text-align:right">Collaudo</span>'+
+      '<span>Rientro</span><span class="v vp">'+(pv.y?anni(pv.y):"–")+'</span><span class="v vr">'+(o.pay?anni(o.pay):"oltre 25")+'</span>'+
+      '<span>Autoconsumo</span><span class="v vp">'+(pv.a!=null?fN.format(pv.a)+"%":"–")+'</span><span class="v vr">'+fN.format(o.autoPct)+'%</span>'+
+      '<span>In 25 anni</span><span class="v vp">'+(o.promT==="risp"&&o.prom>0?eur(o.prom*YEARS-o.price):(pv.y?eur(o.price/pv.y*YEARS-o.price):"–"))+'</span><span class="v vr">'+eur(o.net)+'</span></div>'+
+      '<ul class="rit">'+rt.map(function(x){return '<li'+(x.cl?' class="cl"':'')+'><b>'+esc(x.t)+'</b><span class="eur">'+(x.e!=null?eur(x.e):"")+'</span><p>'+esc(x.p)+(x.q?' Nel PDF: <q>'+esc(x.q)+'</q>':'')+'</p></li>';}).join("")+'</ul>'+
+      '<div class="verd '+v.c+'">'+v.t+'</div><button type="button" class="btn" data-collauda="'+o.k+'">Collauda questo impianto</button></article>';}).join("");
+  $("offersOut").querySelectorAll("[data-collauda]").forEach(function(b){b.addEventListener("click",function(){SIM.offer=b.dataset.collauda;$("simOffer").value=SIM.offer;$("stage").scrollIntoView({behavior:reduceMotion()?"auto":"smooth",block:"center"});setStep("casa");});});
+  /* classifica */
+  var rows=[["Prezzo",function(o){return eur(o.price);}],["Prezzo per kW",function(o){return eur(o.eurKw);}],["Autoconsumo reale",function(o){return fN.format(o.autoPct)+"%";}],
+    ["Rientro promesso",function(o){return isNaN(o.promY)?"–":anni(Math.ceil(o.promY));}],["Rientro al collaudo",function(o){return o.pay?anni(o.pay):"oltre 25 anni";},"key"],
+    ["Risparmio netto in 25 anni",function(o){return eur(o.net);},"key"],["Costo di ogni kWh prodotto",function(o){return fK.format(o.lcoe)+" €";}],
+    ["Indice di Fuffa",function(o){return o.filtro===null?"–":Math.round(o.filtro*100)+"%";},"key"],["Verbale",function(o){return verdOf(o.filtro).t;}]];
+  h='<table class="st"><thead><tr><th></th>'+L.map(function(o){return '<th style="color:var(--p'+o.k+')">'+esc(o.nome)+'</th>';}).join("")+'</tr></thead><tbody>';
+  rows.forEach(function(r){h+='<tr'+(r[2]?' class="key"':'')+'><td>'+r[0]+'</td>'+L.map(function(o){return '<td>'+r[1](o)+'</td>';}).join("")+'</tr>';});
+  $("rank").innerHTML=h+'</tbody></table>';
+  $("rankNote").textContent="Indice di Fuffa = parte della promessa che non regge al collaudo: 1 − rientro promesso ÷ rientro reale (oppure 1 − risparmio reale ÷ risparmio promesso, nei primi 10 anni). Risparmio netto = energia che non compri + energia venduta + detrazione − prezzo, manutenzione, sostituzioni"+(L.some(function(o){return o.fin;})?" e rate":"")+". Costo di ogni kWh prodotto: confrontalo con i "+eur2(R.p)+" che paghi in bolletta."+(S.lv==="rapida"?" Modalità rapida: le ipotesi non inserite sono valori di esempio, elencati più sotto.":"");
+  var q=["Chiedi la stima di produzione annua in kWh e come l’hanno calcolata (per esempio con una simulazione PVGIS), con orientamento, inclinazione e ombre del tuo tetto.",
+    "Chiedi l’autoconsumo che hanno ipotizzato e su quali abitudini. Se non lo sanno, il risparmio promesso non ha passato nessun collaudo.",
+    "Chiedi il prezzo della batteria separato da quello dei pannelli, con capacità utile, cicli garantiti e anni di garanzia.",
+    "Chiedi marca, modello e garanzie scritte di pannelli e inverter: prodotto, rendimento, anni.",
+    "Chiedi cosa è incluso: pratiche, allaccio, sopralluogo, opere sul tetto, tempi di installazione.",
+    "Per la detrazione serve il bonifico “parlante”: chiedi che sia indicato in fattura e conserva tutto.",
+    "Se c’è un finanziamento, chiedi il modulo SECCI con TAEG e costo totale, e confrontalo con il prezzo pagato subito.",
+    "Se l’offerta è “a costo zero” o in noleggio, chiedi di chi è l’impianto, chi incassa la detrazione e cosa succede alla fine del contratto."];
+  $("sAsk").innerHTML='<ol>'+q.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ol>';
+  var wb=L.filter(function(o){return o.batt>0;});
+  $("sBatt").innerHTML=!wb.length?'<p>Nessun preventivo ha la batteria.</p>':'<ul class="ev">'+wb.map(function(o){var b=o.battVal;return '<li><span class="k">'+esc(o.nome)+'</span>Batteria da '+fN1.format(o.batt)+' kWh, '+(b.stim?'costo stimato '+eur(b.cost)+' (non separato nel preventivo: uso 1.100 € al kWh)':'costo '+eur(b.cost))+'. Ti fa autoconsumare circa '+fN.format(b.extraAuto)+' kWh in più il primo anno, '+eur(b.y1Gain)+' l’anno. In 25 anni: '+eur(b.val25)+' di risparmio più '+eur(b.detr)+' di detrazione, meno '+eur(b.cost)+' di acquisto'+(b.repl>0?' e '+eur(b.repl)+' di sostituzione':'')+'. <b>Saldo: '+(b.net>=0?'+':'')+eur(b.net)+'.</b></li>';}).join("")+'</ul>';
+  h='<div class="scroll"><table class="st"><thead><tr><th>Anno</th>'+L.map(function(o){return '<th style="color:var(--p'+o.k+')">'+esc(o.nome)+'</th>';}).join("")+'</tr></thead><tbody>';
+  for(var t=1;t<=YEARS;t++)h+='<tr><td>'+t+'</td>'+L.map(function(o){return '<td'+(o.pay===t?' style="font-weight:700;color:var(--self)"':'')+'>'+eur(o.rows[t-1].cum)+'</td>';}).join("")+'</tr>';
+  $("sYears").innerHTML='<p>Il saldo progressivo di ogni preventivo: quando diventa positivo, l’impianto è ripagato.</p>'+h+'</tbody></table></div>'+calcBox("Ogni anno: energia autoconsumata × prezzo in bolletta (in aumento del "+fN1.format(R.infl*100)+"% l’anno) + energia venduta × "+eur2(R.rid)+" + detrazione (primi 10 anni) − manutenzione − assicurazione − sostituzioni − rate.\nProduzione: kW × "+fN.format(R.resa)+" kWh × orientamento ("+R.fo+") × ombre ("+R.fs+"), con calo dello 0,5% l’anno.");
+  $("sDice").innerHTML='<ul class="ev">'+[["Produzione",fN.format(R.resa)+" kWh per kW all’anno"+(isNaN(XV("resa"))||XV("resa")<=0?" (stima dalla latitudine di "+p.n+": circa 1.550 kWh a 37° e 42 kWh in meno per ogni grado verso nord)":" (inserita da te)")+", ridotta per orientamento ("+fN.format(R.fo*100)+"%) e ombre ("+fN.format(R.fs*100)+"%), con calo dello 0,5% l’anno."],
+    ["Autoconsumo",(S.f1share!==""&&S.f1share!=null?"dalle tue bollette la fascia F1 vale il "+S.f1share+"% dei consumi, quindi ":"")+"il "+fN.format(R.autoDir*100)+"% della produzione si usa direttamente, mai oltre il 60% dei consumi; la batteria ne aggiunge una parte la sera. Riferimento di mercato: 30–40% senza batteria, oltre il 70% con una batteria ben dimensionata."],
+    ["Prezzi","energia in bolletta "+eur2(R.p)+" al kWh, in aumento del "+fN1.format(R.infl*100)+"% l’anno; energia venduta "+eur2(R.rid)+" al kWh."],
+    ["Costi nel tempo","manutenzione "+eur(R.man)+" l’anno; inverter sostituito all’anno "+R.invA+" per "+eur(R.invC)+" se fuori garanzia; batteria sostituita all’anno "+R.batA+" a "+eur(R.batC)+" al kWh."],
+    ["Detrazione",fN.format(R.aliq*100)+"% in 10 anni, batteria compresa"+(isNaN(R.irpef)?".":", limitata alle tue imposte di "+eur(R.irpef)+" l’anno.")],
+    ["Il tuo tetto",roofActive()?activePanels().length+" pannelli da 430 W posati in automatico sul perimetro che hai tracciato, allineati al lato più lungo; "+(RF().type==="piano"?"tetto piano, pannelli a 10°":(RF().multi?RF().faces.length+" falde tracciate da te, esposizione dalla gronda (il lato più lungo di ogni falda)":(RF().type==="padiglione"?"tetto a padiglione con le falde ricavate dal perimetro":"due falde con colmo "+(RF().type==="lungo"?"parallelo al lato lungo":"parallelo al lato corto")))+", inclinazione 20°")+". Resa media "+Math.round(roofFactor()*100)+"% di un tetto a sud inclinato di 30° (est e ovest circa 85%, nord circa 60%). Le curve della giornata seguono l’esposizione di ogni pannello.":"non disegnato: vale l’orientamento scelto nei dati della casa."],
+    ["Giornata simulata","curva di produzione per stagione (estate 1,42, mezze stagioni 1, inverno 0,46 volte la media), consumo di base pari al 62% del tuo consumo annuo distribuito su mattina, giorno e sera, elettrodomestici con potenze e durate tipiche. Batteria utile al 90%, carica e scarica fino a metà della capacità per ora. È un’illustrazione, non un monitoraggio."]].map(function(e){return '<li><span class="k">'+e[0]+'</span>'+esc(e[1])+'</li>';}).join("")+'</ul>';
+  var best=R.best,worst=withF[0];
+  $("verdict").textContent=L.length>1?("Conti alla mano conviene di più "+best.nome+" ("+(best.pay?"rientro reale in "+anni(best.pay):"nessun rientro in 25 anni")+", "+eur(best.net)+" in 25 anni)"+(worst&&worst!==best?". La promessa più gonfiata è quella di "+worst.nome+", con un Indice di Fuffa del "+Math.round(worst.filtro*100)+"%.":".")):(verdOf(L[0].filtro).t+". Un solo preventivo non fa un confronto: chiedine almeno un altro.");
+  $("verdict2").textContent=L.map(function(o){return o.nome+": "+(o.pay?"rientro reale in "+anni(o.pay):"nessun rientro in 25 anni")+", risparmio netto "+eur(o.net)+(o.filtro===null?"":", Indice di Fuffa "+Math.round(o.filtro*100)+"%");}).join(". ")+".";
+  if(SIM.step==="italia"||SIM.step==="prov")mapSVG();
+  drawSim();
+}
+
+/* ---------- lettura dei PDF (solo nel browser) ---------- */
+var PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",PDFW="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+function loadScript(u){return new Promise(function(res,rej){var s=document.createElement("script");s.src=u;s.onload=function(){res();};s.onerror=function(){rej(new Error("load"));};document.head.appendChild(s);});}
+function loadPdfJs(){if(window.pdfjsLib&&window.pdfjsWorker)return Promise.resolve();return loadScript(PDFJS).then(function(){return loadScript(PDFW);}).then(function(){window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFW;});}
+function readPdf(file){return loadPdfJs().then(function(){return file.arrayBuffer();}).then(function(buf){return window.pdfjsLib.getDocument({data:buf,isEvalSupported:false}).promise;}).then(function(pdf){
+  var n=Math.min(pdf.numPages,20),ps=[];for(var i=1;i<=n;i++)ps.push(pdf.getPage(i).then(function(pg){return pg.getTextContent();}).then(function(c){return c.items.map(function(it){return it.str;}).join(" ");}));
+  return Promise.all(ps).then(function(a){return a.join("\n");});});}
+function itNum(x){if(x==null)return NaN;var s=String(x).replace(/[\s€]/g,"");if(s.indexOf(",")>-1)s=s.replace(/\./g,"").replace(",",".");else if(/\.\d{3}(\D|$)/.test(s))s=s.replace(/\./g,"");return parseFloat(s);}
+function near(t,re,kw,win){var m,best=[];re.lastIndex=0;while((m=re.exec(t))){var a=Math.max(0,m.index-win),ctx=t.slice(a,m.index+m[0].length+win).toLowerCase();if(!kw||kw.test(ctx))best.push({m:m,i:m.index});}return best;}
+function snip(t,i,len){var a=Math.max(0,i-30),b=Math.min(t.length,i+(len||90));return (a>0?"…":"")+t.slice(a,b).replace(/\s+/g," ").trim()+(b<t.length?"…":"");}
+var CLAUSES=[
+  [/iva\s*(esclusa|non\s*inclusa|non\s*compresa)|\+\s*iva|oltre\s*(l['’]\s*)?iva/i,"Il prezzo è IVA esclusa","Per un impianto su un’abitazione di solito si aggiunge l’IVA al 10%: controlla che il confronto sia tra prezzi finiti."],
+  [/pratiche[^.\n]{0,50}(escluse|non\s*incluse|a\s*carico\s*del\s*cliente)/i,"Pratiche escluse","Allaccio, comunicazioni e pratiche per la detrazione hanno un costo: chiedi quanto e chi le segue."],
+  [/(acconto|anticipo)[^.\n]{0,50}\d{1,3}\s*%/i,"Acconto prima dei lavori","Pagare una parte prima dell’installazione è normale, una parte grande no: chiedi le date di consegna e cosa succede se slittano."],
+  [/\bpenal[ei]\b/i,"C’è una penale","Leggi quando scatta e quanto vale: le penali raramente sono a favore del cliente."],
+  [/(opere\s*edili|ponteggi?|linea\s*vita|cestello|rimozione[^.\n]{0,20}(amianto|eternit))[^.\n]{0,60}(esclus|non\s*incl|a\s*carico|extra|a\s*parte)/i,"Lavori sul tetto a parte","Ponteggi, linea vita o opere edili esclusi possono costare centinaia o migliaia di euro: fatti fare il prezzo prima."],
+  [/manutenzione[^.\n]{0,50}(esclusa|non\s*inclusa|a\s*pagamento|a\s*carico)/i,"Manutenzione esclusa","Chiedi quanto costa all’anno e cosa comprende."],
+  [/salvo\s*(sopralluogo|verific|approvazion|disponibilit|conferm)/i,"Prezzo “salvo”","Il prezzo può cambiare dopo il sopralluogo o le verifiche: fatti scrivere un prezzo definitivo prima di firmare."],
+  [/(offerta|prezzo|promozione)[^.\n]{0,40}valid[^.\n]{0,40}(\d{1,2})\s*(giorni|gg)|valida\s*fino\s*al/i,"La fretta","Le offerte con scadenza ravvicinata servono a non farti confrontare. Un preventivo serio regge qualche settimana."],
+  [/garanzi[^.\n]{0,40}(del\s*produttore|del\s*costruttore|della\s*casa\s*madre)/i,"Garanzia del produttore, non dell’installatore","Se un componente si rompe, chiedi chi interviene e chi paga la manodopera: la garanzia del produttore spesso copre solo il pezzo."],
+  [/(sconto\s*in\s*fattura|cessione\s*del\s*credito)/i,"Sconto in fattura o cessione","Verifica che sia ancora possibile per il tuo caso e chi incassa la detrazione: spesso è rimasta solo la detrazione in 10 anni."],
+  [/(monitoraggio|app)[^.\n]{0,50}(abbonamento|canone|a\s*pagamento)/i,"Il canone del monitoraggio","Un costo ricorrente piccolo, per 25 anni: chiedi quanto e se si può disdire."],
+  [/fino\s*al?\s*\d{1,3}\s*%/i,"Il “fino a”","“Fino a” vuol dire “nel caso migliore”: chiedi la stima nel tuo caso, non il massimo teorico."],
+  [/bolletta\s*(zero|azzerata|gratis)|energia\s*gratis|a\s*costo\s*zero/i,"La promessa assoluta","Bolletta zero e costo zero non esistono: restano quota fissa, oneri, consumi serali e la rata. Chiedi i numeri."],
+  [/finanziament|rate\s*mensili|tan\b|taeg\b/i,"C’è un finanziamento","Chiedi il modulo SECCI con TAEG e costo totale, e confrontalo con il prezzo pagato subito."]
+];
+function extract(t){
+  var res={f:{},got:[],miss:[],cl:[]},lw=t.toLowerCase();
+  /* prezzo totale */
+  var amtRe=/(?:€|eur(?:o)?)\s*([0-9][0-9.\s]{2,}(?:,\d{1,2})?)|([0-9][0-9.]{2,}(?:,\d{1,2})?)\s*(?:€|eur(?:o)?\b)/gi;
+  var c=near(t,amtRe,/(totale|complessiv|prezzo|importo|investimento|chiavi\s*in\s*mano)/,70).map(function(x){return itNum(x.m[1]||x.m[2]);}).filter(function(v){return v>=1500&&v<=150000;});
+  if(c.length){res.f.prezzo=Math.max.apply(null,c);res.got.push("prezzo "+eur(res.f.prezzo));}else res.miss.push("prezzo");
+  /* potenza */
+  var kw=near(t,/(\d{1,2}(?:[.,]\d{1,2})?)\s*(kwp|kw\s*p|kw)(?!h)/gi,null,0).map(function(x){return {v:itNum(x.m[1]),p:/p/i.test(x.m[2])};}).filter(function(x){return x.v>=1&&x.v<=60;});
+  if(kw.length){var kp=kw.filter(function(x){return x.p;});res.f.kw=(kp.length?kp:kw)[0].v;res.got.push("potenza "+fN1.format(res.f.kw)+" kW");}else res.miss.push("potenza");
+  /* batteria */
+  var bt=near(t,/(\d{1,2}(?:[.,]\d{1,2})?)\s*kwh(?!\s*\/?\s*(anno|annu|a\b))/gi,/(batteri|accumul|storage)/,80).map(function(x){return itNum(x.m[1]);}).filter(function(v){return v>=1.5&&v<=60;});
+  if(/(senza|no|privo\s*di)\s*(batteri|accumul|sistema\s*di\s*accumul)/.test(lw)){res.f.batt=0;res.got.push("senza batteria");}else if(bt.length){res.f.batt=bt[0];res.got.push("batteria "+fN1.format(res.f.batt)+" kWh");}else if(/(batteri|accumul)/.test(lw))res.miss.push("capacità della batteria");else{res.f.batt=0;}
+  /* promesse */
+  var pb=/(rientro|ritorno\s*dell['’]?\s*investimento|si\s*ripaga|ripagat|payback|ammortament)[^.\n]{0,70}?(\d{1,2}(?:[.,]\d)?)\s*anni/i.exec(t);
+  if(pb){res.f.promT="anni";res.f.prom=itNum(pb[2]);res.got.push("rientro promesso "+anni(res.f.prom));}
+  else{var rs=/risparmi[^.\n]{0,60}?(?:€\s*([0-9][0-9.]*(?:,\d{1,2})?)|([0-9][0-9.]*(?:,\d{1,2})?)\s*€)[^.\n]{0,30}(anno|annu)/i.exec(t);
+    if(rs){res.f.promT="risp";res.f.prom=itNum(rs[1]||rs[2]);res.got.push("risparmio promesso "+eur(res.f.prom)+" l’anno");}else res.miss.push("promessa di rientro o risparmio");}
+  /* esperta */
+  var au=/autoconsum[^.\n]{0,50}?(\d{1,3})\s*%/i.exec(t);if(au){res.f.autoV=itNum(au[1]);res.got.push("autoconsumo dichiarato "+res.f.autoV+"%");res.xp=true;}
+  var pr=/(produzion|producibilit)[^.\n]{0,60}?(\d{1,2}[.\s]?\d{3})\s*kwh/i.exec(t);if(pr){res.prod=itNum(pr[2]);res.got.push("produzione stimata "+fN.format(res.prod)+" kWh l’anno");}
+  var gi=/inverter[^.\n]{0,90}?garanzi[^.\n]{0,30}?(\d{1,2})\s*anni|garanzi[^.\n]{0,15}inverter[^.\n]{0,25}?(\d{1,2})\s*anni|garanzi[^.\n]{0,30}?(\d{1,2})\s*anni[^.\n]{0,40}inverter/i.exec(t);if(gi){res.f.garInv=itNum(gi[1]||gi[2]||gi[3]);res.got.push("garanzia inverter "+anni(res.f.garInv));res.xp=true;}
+  var bc=/(batteri|accumul)[^.\n]{0,60}?(?:€\s*([0-9][0-9.]*(?:,\d{1,2})?)|([0-9][0-9.]*(?:,\d{1,2})?)\s*€)/i.exec(t);if(bc&&res.f.batt>0){var bcv=itNum(bc[2]||bc[3]);if(bcv>500&&bcv<(res.f.prezzo||1e9)){res.f.battC=bcv;res.got.push("prezzo batteria "+eur(bcv));res.xp=true;}}
+  var rt=/(\d{2,3})\s*rate[^.\n]{0,40}?(?:€\s*([0-9][0-9.]*(?:,\d{1,2})?)|([0-9][0-9.]*(?:,\d{1,2})?)\s*€)/i.exec(t)||null;
+  if(rt){res.f.fin=true;res.f.mesi=itNum(rt[1]);res.f.rata=itNum(rt[2]||rt[3]);res.got.push(res.f.mesi+" rate da "+eur(res.f.rata));res.xp=true;}
+  /* clausole */
+  CLAUSES.forEach(function(cl){var m=cl[0].exec(t);if(m)res.cl.push({t:cl[1],p:cl[2],q:snip(t,m.index,80)});});
+  if(/wp\b/i.test(t)&&!/(marca|modello|produttore)/i.test(lw))res.cl.push({t:"Marca e modello?",p:"Il preventivo parla di potenza dei moduli ma non cita marca e modello: chiedili per iscritto, con la scheda tecnica.",q:""});
+  if(res.f.prezzo&&/iva\s*(esclusa|non\s*inclusa)|\+\s*iva|oltre\s*(l['’]\s*)?iva/i.test(t)){res.f.prezzo=Math.round(res.f.prezzo*1.10);res.got.push("aggiunta IVA 10% al prezzo");}
+  return res;
+}
+window.__extract=extract;window.__assign=function(k,r,n){assign(k,r,n);fill();save();render();};
+function assign(k,res,name){
+  var f=res.f;S[k+"_on"]=true;S[k+"_nome"]=name.replace(/\.pdf$/i,"").replace(/[_-]+/g," ").slice(0,28)||("Preventivo "+k);
+  ["prezzo","kw","batt","promT","prom","autoV","battC","garInv","rata","mesi"].forEach(function(x){if(f[x]!=null&&!(typeof f[x]==="number"&&isNaN(f[x])))S[k+"_"+x]=f[x];});
+  if(f.fin)S[k+"_fin"]=true;
+  if(res.prod&&f.kw){S.resa=Math.round(res.prod/f.kw);}
+  S[k+"_cl"]=res.cl;
+  S[k+"_found"]='<b>Dal PDF “'+esc(name)+'”</b>'+(res.got.length?'<ul>'+res.got.map(function(g){return '<li>'+esc(g)+'</li>';}).join("")+'</ul>':'')+(res.miss.length?'<div>Non trovato: '+esc(res.miss.join(", "))+'. Inseriscilo a mano.</div>':'')+'<div>Controlla i valori: ogni preventivo è scritto a modo suo.</div>';
+  if((res.xp||res.prod)&&S.lv==="rapida")setLv("esperta");
+}
+function handleFiles(files,startKey){
+  var list=[].slice.call(files).filter(function(f){return /pdf$/i.test(f.type)||/\.pdf$/i.test(f.name);}).slice(0,startKey?1:4);
+  if(!list.length){$("pdfMsg").textContent="Serve un file PDF.";return;}
+  $("pdfMsg").textContent="Leggo "+(list.length===1?"il PDF":list.length+" PDF")+"…";
+  var keys=startKey?[startKey]:KEYS.slice(0,list.length);
+  Promise.all(list.map(function(f,i){return readPdf(f).then(function(t){return {k:keys[i],f:f,t:t};},function(){return {k:keys[i],f:f,t:null};});})).then(function(out){
+    var msgs=[];
+    out.forEach(function(o){
+      if(o.t===null){msgs.push(o.f.name+": non riesco ad aprirlo");return;}
+      if(o.t.replace(/\s/g,"").length<40){msgs.push(o.f.name+": sembra una scansione, senza testo da leggere. Inserisci i dati a mano");S[o.k+"_on"]=true;S[o.k+"_found"]="<b>Dal PDF “"+esc(o.f.name)+"”</b><div>Sembra una scansione: non contiene testo leggibile. Inserisci i dati a mano.</div>";S[o.k+"_cl"]=[];return;}
+      var r=extract(o.t);assign(o.k,r,o.f.name);msgs.push(o.f.name+": trovati "+r.got.length+" dati e "+r.cl.length+" clausole da guardare");
+    });
+    if(!startKey)KEYS.slice(list.length).forEach(function(k){S[k+"_on"]=false;});
+    levels={};fill();save();render();$("pdfMsg").textContent=msgs.join(". ")+".";
+  });
+}
+(function(){var d=$("drop"),inp=$("pdfIn");
+  d.addEventListener("click",function(){inp.click();});
+  d.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();inp.click();}});
+  inp.addEventListener("change",function(){handleFiles(inp.files);inp.value="";});
+  ["dragenter","dragover"].forEach(function(ev){d.addEventListener(ev,function(e){e.preventDefault();d.classList.add("over");});});
+  ["dragleave","drop"].forEach(function(ev){d.addEventListener(ev,function(e){e.preventDefault();d.classList.remove("over");});});
+  d.addEventListener("drop",function(e){if(e.dataTransfer&&e.dataTransfer.files)handleFiles(e.dataTransfer.files);});
+  document.querySelectorAll("[data-pdf]").forEach(function(el){el.addEventListener("change",function(){handleFiles(el.files,el.dataset.pdf);el.value="";});});
+})();
+
+
+
+/* ================= IL TETTO DALL'ALTO ================= */
+var PANEL_W=1.13,PANEL_H=1.72,PANEL_KW=0.43;
+var DNAME={0:"Nord",45:"Nord-Est",90:"Est",135:"Sud-Est",180:"Sud",225:"Sud-Ovest",270:"Ovest",315:"Nord-Ovest"};
+var RS={sel:-1};
+function RF(){if(!S.roof||typeof S.roof!=="object")S.roof=JSON.parse(JSON.stringify(DEF.roof));var r=S.roof;if(!r.outline)r.outline=[];return r;}
+function roofActive(){return !!S.roofOn&&RF().panels.length>0;}
+function activePanels(){return RF().panels.filter(function(p){return !p.off;});}
+function yieldF(az,flat){var dev=Math.abs(((az-180)%360+540)%360-180)*Math.PI/180,fd=0.825+0.2*Math.cos(dev)-0.025*Math.cos(2*dev),t=flat?10:20;return 0.87+(fd-0.87)*(t/30);}
+function roofFactor(list){list=list||activePanels();if(!list.length)return 1;var s=0,flat=RF().type==="piano"&&!RF().multi;list.forEach(function(p){s+=yieldF(p.az,flat);});return s/list.length;}
+function roofCurve(season,list){
+  var flat=RF().type==="piano"&&!RF().multi,key="R|"+season+"|"+S.ombre+"|"+S.prov+"|"+flat+"|"+list.map(function(p){return p.az;}).sort().join(",");if(curveCache[key])return curveCache[key];
+  var p=provObj(),sd=SEASON[season],len=sd.len+(season==="estate"?(p.lat-42)*0.12:(season==="inverno"?-(p.lat-42)*0.12:0));
+  var a=new Float32Array(1440),tot=0,sr=13*60-len*30,ss=13*60+len*30,g={};
+  list.forEach(function(q){g[q.az]=(g[q.az]||0)+yieldF(q.az,flat);});
+  Object.keys(g).forEach(function(az){az=+az;var dv=((az-180+540)%360-180),mid=13*60+dv*(flat?0.8:2.4),exp=Math.abs(dv)>120?1.0:1.6,c=new Float32Array(1440),ct=0;
+    for(var m=0;m<1440;m++){if(m<=sr||m>=ss)continue;var x=(m-(mid-(ss-sr)/2))/(ss-sr);if(x<=0||x>=1)continue;var v=Math.pow(Math.sin(Math.PI*x),exp);
+      if(S.ombre==="poche"&&m<sr+120)v*=0.55;if(S.ombre==="molte"&&(m<sr+180||m>ss-120))v*=0.45;c[m]=v;ct+=v;}
+    for(m=0;m<1440;m++)a[m]+=ct?c[m]/ct*g[az]:0;tot+=g[az];});
+  for(var m=0;m<1440;m++)a[m]=tot?a[m]/tot:0;a.sr=sr;a.ss=ss;curveCache[key]=a;return a;
+}
+function peakTime(c){var b=0,bi=0;for(var m=0;m<1440;m++)if(c[m]>b){b=c[m];bi=m;}return bi;}
+/* geometria del tetto */
+function inPoly(x,y,pts){var c=false;for(var i=0,j=pts.length-1;i<pts.length;j=i++){var a=pts[i],b=pts[j];if(((a[1]>y)!==(b[1]>y))&&(x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0]))c=!c;}return c;}
+function longest(pts){var b=0,bi=0;for(var i=0;i<pts.length;i++){var a=pts[i],c=pts[(i+1)%pts.length],l=Math.hypot(c[0]-a[0],c[1]-a[1]);if(l>b){b=l;bi=i;}}return {i:bi,len:b};}
+function azOf(vx,vy){var n=(RF().north||0);return (Math.round(((Math.atan2(vx,-vy)*180/Math.PI)-n+720)%360/5)*5)%360;}
+function faceAt(x,y){var F=computeFaces();for(var i=0;i<F.length;i++)if(inPoly(x,y,F[i].poly))return F[i];return null;}
+function panelAz(p){var r=RF();if(r.type==="piano"&&!r.multi){var a=((p.rot||0)+90)*Math.PI/180;return azOf(Math.cos(a),Math.sin(a));}var f=faceAt(p.x,p.y);return f?f.az:p.az;}
+function dname(az){return DNAME[(Math.round(az/45)*45)%360];}
+function centroid(P){var x=0,y=0;P.forEach(function(p){x+=p[0];y+=p[1];});return [x/P.length,y/P.length];}
+function areaPx(P){return Math.abs(P.reduce(function(a,p,i){var q=P[(i+1)%P.length];return a+p[0]*q[1]-q[0]*p[1];},0))/2;}
+/* taglia il poligono con il semipiano a·p + b <= 0 */
+function clip(P,a,b){var out=[];for(var i=0;i<P.length;i++){var A=P[i],B=P[(i+1)%P.length],fa=a[0]*A[0]+a[1]*A[1]+b,fb=a[0]*B[0]+a[1]*B[1]+b;
+  if(fa<=0)out.push(A);if((fa<0&&fb>0)||(fa>0&&fb<0)){var t=fa/(fa-fb);out.push([A[0]+(B[0]-A[0])*t,A[1]+(B[1]-A[1])*t]);}}return out;}
+function inward(P,i){var A=P[i],B=P[(i+1)%P.length],dx=B[0]-A[0],dy=B[1]-A[1],L=Math.hypot(dx,dy)||1,n=[-dy/L,dx/L],c=centroid(P);if((c[0]-A[0])*n[0]+(c[1]-A[1])*n[1]<0)n=[-n[0],-n[1]];return {n:n,u:[dx/L,dy/L],A:A};}
+function frame(){var r=RF(),pts=r.multi?(r.faces[0]||r.cur):r.outline,L=longest(pts),a=pts[L.i],c=pts[(L.i+1)%pts.length],th=Math.atan2(c[1]-a[1],c[0]-a[0]),u=[Math.cos(th),Math.sin(th)],v=[-Math.sin(th),Math.cos(th)];
+  var S_=pts.map(function(p){return p[0]*u[0]+p[1]*u[1];}),T_=pts.map(function(p){return p[0]*v[0]+p[1]*v[1];});
+  return {th:th,u:u,v:v,smin:Math.min.apply(null,S_),smax:Math.max.apply(null,S_),tmin:Math.min.apply(null,T_),tmax:Math.max.apply(null,T_),L:L,pts:pts};}
+/* le falde, secondo la forma scelta */
+function computeFaces(){
+  var r=RF(),F=[];
+  if(r.multi){r.faces.forEach(function(P){if(P.length<3)return;var L=longest(P),w=inward(P,L.i);F.push({poly:P,u:w.u,az:azOf(-w.n[0],-w.n[1])});});return F;}
+  var P=r.outline;if(P.length<3)return F;var fr=frame(),type=r.type;
+  if(type==="piano")return [{poly:P,u:fr.u,az:180,flat:true}];
+  if(type==="lungo"||type==="corto"){var lg=type==="lungo",n=lg?fr.v:fr.u,m=lg?(fr.tmin+fr.tmax)/2:(fr.smin+fr.smax)/2,ud=lg?fr.u:fr.v;
+    var A=clip(P,n,-m),B=clip(P,[-n[0],-n[1]],m);
+    if(A.length>2)F.push({poly:A,u:ud,az:azOf(-n[0],-n[1])});if(B.length>2)F.push({poly:B,u:ud,az:azOf(n[0],n[1])});return F;}
+  /* padiglione: ogni falda è la parte di tetto più vicina alla sua gronda */
+  var W=P.map(function(_,k){return inward(P,k);});
+  W.forEach(function(wi,ii){var Q=P.slice();W.forEach(function(wj,jj){if(ii===jj||!Q.length)return;var a=[wi.n[0]-wj.n[0],wi.n[1]-wj.n[1]],b=-((wi.n[0]*wi.A[0]+wi.n[1]*wi.A[1])-(wj.n[0]*wj.A[0]+wj.n[1]*wj.A[1]));Q=clip(Q,a,b);});
+    if(Q.length>2&&areaPx(Q)>4)F.push({poly:Q,u:wi.u,az:azOf(-wi.n[0],-wi.n[1])});});
+  return F;
+}
+/* pannelli allineati alla gronda di ogni falda */
+function fillFace(fc,sc){
+  var P=fc.poly,u=fc.u,v=[-u[1],u[0]],mg=0.25*sc,gap=0.03*sc,best=[];
+  var Su=P.map(function(p){return p[0]*u[0]+p[1]*u[1];}),Tv=P.map(function(p){return p[0]*v[0]+p[1]*v[1];}),smin=Math.min.apply(null,Su),smax=Math.max.apply(null,Su),tmin=Math.min.apply(null,Tv),tmax=Math.max.apply(null,Tv);
+  [[PANEL_W,PANEL_H],[PANEL_H,PANEL_W]].forEach(function(dim){var pw=dim[0]*sc,ph=dim[1]*sc;
+  [0,0.5].forEach(function(ph1){[0,0.5].forEach(function(ph2){var list=[];
+    for(var s0=smin+mg+ph1*(pw+gap);s0+pw<=smax-mg+0.01;s0+=pw+gap)for(var t0=tmin+mg+ph2*(ph+gap);t0+ph<=tmax-mg+0.01;t0+=ph+gap){
+      var ok=true;[[s0-mg,t0-mg],[s0+pw+mg,t0-mg],[s0+pw+mg,t0+ph+mg],[s0-mg,t0+ph+mg]].forEach(function(k){var x=k[0]*u[0]+k[1]*v[0],y=k[0]*u[1]+k[1]*v[1];if(!inPoly(x,y,P))ok=false;});
+      if(ok){var cs=s0+pw/2,ct=t0+ph/2;list.push({x:cs*u[0]+ct*v[0],y:cs*u[1]+ct*v[1],az:fc.az,off:false,w:dim[0],h:dim[1],rot:Math.atan2(u[1],u[0])*180/Math.PI});}}
+    if(list.length>best.length*1.15||(!best.length&&list.length))best=list;});});});
+  return best;
+}
+function layout(){var r=RF();if(!r.closed)return;var F=computeFaces(),P=[];F.forEach(function(fc){P=P.concat(fillFace(fc,r.scale));});r.panels=P;r.tilt=(r.type==="piano"&&!r.multi)?"piano":"incl";}
+/* disegno */
+function roofSVG(){
+  var r=RF(),W=r.w,H=r.h,sc=r.scale||25,h='',drawn=r.closed&&(r.multi?r.faces.length>0:r.outline.length>2),showPhoto=r.img&&(!drawn||r.view==="foto"),F=drawn?frame():null;
+  $("roof").setAttribute("viewBox","0 0 "+W+" "+H);
+  var thd=F?F.th*180/Math.PI:0;
+  h+='<defs><pattern id="tiles" width="'+(sc*0.33)+'" height="'+(sc*0.33)+'" patternUnits="userSpaceOnUse" patternTransform="rotate('+(r.type==="corto"?thd+90:thd).toFixed(1)+')"><path d="M0 '+(sc*0.3)+' H'+(sc*0.33)+'" stroke="#000" stroke-opacity=".13" stroke-width="'+(sc*0.05)+'"/></pattern>'+
+    '<pattern id="slab" width="'+sc+'" height="'+sc+'" patternUnits="userSpaceOnUse" patternTransform="rotate('+thd.toFixed(1)+')"><path d="M0 0 H'+sc+' M0 0 V'+sc+'" stroke="#000" stroke-opacity=".08" stroke-width="1"/></pattern>'+
+    '<filter id="soft"><feColorMatrix type="saturate" values="0.35"/></filter>'+(drawn?'<clipPath id="rclip"><path d="M'+r.outline.map(function(p){return p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(" L")+'Z"/></clipPath>':'')+'</defs>';
+  if(showPhoto)h+='<image href="'+r.img+'" x="0" y="0" width="'+W+'" height="'+H+'" preserveAspectRatio="none" filter="url(#soft)"/>';
+  else{h+='<rect width="'+W+'" height="'+H+'" fill="#CFE6C1"/>';for(var k=0;k<16;k++){var tx=(k*137+40)%W,ty=(k*251+30)%H;h+='<circle cx="'+tx+'" cy="'+ty+'" r="'+(sc*(0.8+(k%3)*0.45))+'" fill="#B7DAA4" opacity=".8"/>';}
+    if(!drawn){for(var x=0;x<W;x+=sc)h+='<path d="M'+x+' 0 V'+H+'" stroke="#fff" stroke-opacity=".55"/>';for(var y=0;y<H;y+=sc)h+='<path d="M0 '+y+' H'+W+'" stroke="#fff" stroke-opacity=".55"/>';}}
+  if(drawn&&!showPhoto){
+    var FF=computeFaces(),all=r.multi?r.faces:[r.outline];
+    all.forEach(function(P){h+='<path d="M'+P.map(function(p){return p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(" L")+'Z" transform="translate('+(sc*0.35)+' '+(sc*0.45)+')" fill="#000" opacity=".16"/>';});
+    FF.forEach(function(fc,k){var d='M'+fc.poly.map(function(p){return p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(" L")+'Z',f=yieldF(fc.az,!!fc.flat),mix=Math.max(0,Math.min(1,(f-0.65)/0.38)),rr=Math.round(176+(224-176)*mix),gg=Math.round(86+(132-86)*mix),bb=Math.round(64+(99-64)*mix),ang=Math.atan2(fc.u[1],fc.u[0])*180/Math.PI;
+      h+='<defs><pattern id="tl'+k+'" width="'+(sc*0.33)+'" height="'+(sc*0.33)+'" patternUnits="userSpaceOnUse" patternTransform="rotate('+(fc.flat?ang:ang+90).toFixed(1)+')"><path d="M0 '+(sc*0.3)+' H'+(sc*0.33)+'" stroke="#000" stroke-opacity=".13" stroke-width="'+(sc*0.05)+'"/></pattern></defs>';
+      h+='<path d="'+d+'" fill="'+(fc.flat?"#C9CED3":"rgb("+rr+","+gg+","+bb+")")+'"/><path d="'+d+'" fill="url(#tl'+k+')"/><path d="'+d+'" fill="none" stroke="#7A3424" stroke-width="'+(sc*0.12)+'" stroke-linejoin="round"/>';
+      if(!r.panels.some(function(p){return !p.off;})){var c=centroid(fc.poly);h+='<text x="'+c[0]+'" y="'+c[1]+'" text-anchor="middle" font-family="IBM Plex Sans,Arial" font-size="'+(sc*0.55)+'" font-weight="700" fill="#fff" opacity=".9">'+dname(fc.az)+'</text>';}});
+    all.forEach(function(P){h+='<path d="M'+P.map(function(p){return p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(" L")+'Z" fill="none" stroke="#3D2A22" stroke-width="'+(sc*0.12)+'" stroke-linejoin="round"/>';});
+  }else if(r.multi&&(r.faces.length||r.cur.length)){
+    r.faces.forEach(function(P){h+='<path d="M'+P.map(function(p){return p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(" L")+'Z" fill="#17A673" fill-opacity=".25" stroke="#17A673" stroke-width="'+(W/300)+'"/>';});
+    if(r.cur.length){h+='<path d="M'+r.cur.map(function(p){return p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(" L")+'" fill="#FFB000" fill-opacity=".2" stroke="#FFB000" stroke-width="'+(W/250)+'"/>';r.cur.forEach(function(p,i){h+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+(W/(i===0?80:130))+'" fill="'+(i===0?"#FFFFFF":"#FFB000")+'" stroke="#FFB000" stroke-width="'+(W/300)+'"/>';});}
+  }else if(r.outline.length){
+    h+='<path d="M'+r.outline.map(function(p){return p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(" L")+(drawn?"Z":"")+'" fill="#FFB000" fill-opacity=".2" stroke="#FFB000" stroke-width="'+(W/250)+'"/>';
+    r.outline.forEach(function(p,i){h+='<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+(W/(i===0?80:130))+'" fill="'+(i===0?"#FFFFFF":"#FFB000")+'" stroke="#FFB000" stroke-width="'+(W/300)+'"/>';});
+  }
+  if(drawn&&!$("sideAsk").hidden){var L=F.L,a=F.pts[L.i],c=F.pts[(L.i+1)%F.pts.length];h+='<path d="M'+a[0]+' '+a[1]+' L'+c[0]+' '+c[1]+'" stroke="#FFD43B" stroke-width="'+(W/120)+'" stroke-linecap="round"/>';}
+  if(!r.img&&!r.outline.length&&!r.faces.length&&!r.cur.length)h+='<text x="'+(W/2)+'" y="'+(H/2-12)+'" text-anchor="middle" font-family="IBM Plex Sans,Arial" font-size="20" font-weight="600" fill="#4E6B4A">Carica lo screenshot del tetto</text><text x="'+(W/2)+'" y="'+(H/2+16)+'" text-anchor="middle" font-family="IBM Plex Sans,Arial" font-size="16" fill="#4E6B4A">oppure tocca qui gli angoli del tetto sulla griglia (un quadretto = 1 m)</text>';
+  var flat=r.type==="piano"&&!r.multi;
+  if(!showPhoto)r.panels.forEach(function(p,i){var w=p.w*sc,hh=p.h*sc,f=yieldF(p.az,flat),col=f>0.95?"#17A673":(f>0.85?"#7CC243":(f>0.75?"#F59E0B":"#D9463B")),cells='';
+    var nx=p.w>p.h?6:4,ny=p.w>p.h?4:6;for(var a2=1;a2<nx;a2++)cells+='M'+(-w/2+w*a2/nx).toFixed(1)+' '+(-hh/2).toFixed(1)+' V'+(hh/2).toFixed(1)+' ';for(var b=1;b<ny;b++)cells+='M'+(-w/2).toFixed(1)+' '+(-hh/2+hh*b/ny).toFixed(1)+' H'+(w/2).toFixed(1)+' ';
+    h+='<g data-pi="'+i+'" transform="translate('+p.x.toFixed(1)+' '+p.y.toFixed(1)+') rotate('+(p.rot!=null?p.rot:(r.th||0)).toFixed(2)+')" opacity="'+(p.off?0.3:1)+'" style="cursor:pointer"><rect x="'+(-w/2+sc*0.07).toFixed(1)+'" y="'+(-hh/2+sc*0.09).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+hh.toFixed(1)+'" rx="'+(sc*0.05)+'" fill="#000" opacity=".22"/><rect x="'+(-w/2).toFixed(1)+'" y="'+(-hh/2).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+hh.toFixed(1)+'" rx="'+(sc*0.05)+'" fill="#18336F" stroke="'+(i===RS.sel?"#FFB000":"#E8EEF7")+'" stroke-width="'+(i===RS.sel?sc*0.16:sc*0.05)+'"'+(p.off?' stroke-dasharray="3 3"':'')+'/>'+
+      '<path d="'+cells+'" stroke="#5B7FD0" stroke-width="'+(sc*0.025)+'"/></g>';
+    if(i===RS.sel){var hd=(Math.max(p.w,p.h)/2+0.7)*sc,ra=((p.rot!=null?p.rot:0)-90)*Math.PI/180,hx=p.x+Math.cos(ra)*hd,hy=p.y+Math.sin(ra)*hd;
+      h+='<path d="M'+p.x.toFixed(1)+' '+p.y.toFixed(1)+' L'+hx.toFixed(1)+' '+hy.toFixed(1)+'" stroke="#FFB000" stroke-width="'+(sc*0.07)+'" pointer-events="none"/><circle data-rh="1" cx="'+hx.toFixed(1)+'" cy="'+hy.toFixed(1)+'" r="'+(sc*0.42)+'" fill="#FFFFFF" stroke="#FFB000" stroke-width="'+(sc*0.12)+'" style="cursor:grab"/><path d="M'+(hx-sc*0.18).toFixed(1)+' '+hy.toFixed(1)+' a'+(sc*0.18)+' '+(sc*0.18)+' 0 1 1 '+(sc*0.1)+' '+(sc*0.15)+'" fill="none" stroke="#B45309" stroke-width="'+(sc*0.06)+'" pointer-events="none"/>';}
+    if(!p.off)h+='<g transform="translate('+p.x.toFixed(1)+' '+p.y.toFixed(1)+') rotate('+p.az+')" pointer-events="none"><circle r="'+(sc*0.26)+'" fill="'+col+'" stroke="#fff" stroke-width="'+(sc*0.05)+'"/><path d="M0 '+(-sc*0.17)+' L'+(sc*0.11)+' '+(sc*0.07)+' L0 '+(sc*0.02)+' L'+(-sc*0.11)+' '+(sc*0.07)+'Z" fill="#fff"/></g>';});
+  var cs=Math.min(W,H)/9,cx=W-cs*0.9,cy=cs*1.2;
+  h+='<g pointer-events="none" transform="rotate('+(r.north||0)+' '+cx+' '+cy+')"><circle cx="'+cx+'" cy="'+cy+'" r="'+(cs*0.6)+'" fill="#FFFFFF" fill-opacity=".92" stroke="#0E2A40" stroke-width="'+(cs*0.04)+'"/><path d="M'+cx+' '+(cy-cs*0.45)+' L'+(cx+cs*0.14)+' '+cy+' L'+(cx-cs*0.14)+' '+cy+'Z" fill="#D9463B"/><path d="M'+cx+' '+(cy+cs*0.45)+' L'+(cx+cs*0.14)+' '+cy+' L'+(cx-cs*0.14)+' '+cy+'Z" fill="#5A6B7B"/><text x="'+cx+'" y="'+(cy-cs*0.68)+'" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-weight="600" font-size="'+(cs*0.3)+'" fill="#0E2A40" paint-order="stroke" stroke="#FFFFFF" stroke-width="'+(cs*0.08)+'">N</text></g>';
+  $("roof").innerHTML=h;
+  var pts=r.multi?r.cur:r.outline;
+  $("stepInfo").textContent=drawn?(r.panels.length?"":"Il tetto è troppo piccolo per un pannello: controlla la misura."):(r.multi?(r.cur.length>2?"Chiudi questa falda con “Fatto”.":(r.faces.length?"Falde tracciate: "+r.faces.length+". Traccia la prossima, o premi “Ho finito le falde”.":"Tocca gli angoli della prima falda.")):(!r.outline.length?(r.img?"Tocca uno alla volta gli angoli del tuo tetto.":""):(r.outline.length>2?"Hai finito gli angoli? Premi “Fatto: chiudi il perimetro”.":"Continua con gli angoli del tuo tetto.")));
+  $("rUndo").hidden=!(pts.length&&!drawn);$("rClose").hidden=!(pts.length>2&&!drawn);$("rClose").textContent=r.multi?"Fatto: chiudi questa falda":"Fatto: chiudi il perimetro";
+  $("rDone").hidden=!(r.multi&&r.faces.length&&!drawn&&!r.cur.length);$("rDelFace").hidden=!(r.multi&&r.faces.length&&!drawn);
+  $("rView").hidden=!(r.img&&drawn);$("rView").textContent=r.view==="foto"?"Mostra il disegno":"Mostra la foto";
+  var stp=!r.img&&!pts.length&&!r.faces.length&&!drawn?1:(!drawn&&$("sideAsk").hidden?2:(!$("sideAsk").hidden?3:4));
+  var G=[["Carica uno screenshot satellite (Google Maps) o una foto del drone, fatta dall’alto.",1],
+    [r.multi?"Tocca gli angoli di una falda e premi “Fatto: chiudi questa falda”; ripeti per ogni falda, poi “Ho finito le falde”.":"Tocca gli angoli del tuo tetto, uno dopo l’altro, poi premi “Fatto: chiudi il perimetro”. Tetto con tante falde? Usa il link “Il mio tetto ha più falde”.",2],
+    ["Controlla la lunghezza del lato giallo (Google Maps la misura con “Misura distanza”) e premi OK.",3],
+    ["Scegli la forma del tetto. Poi, se vuoi, tocca un pannello per spostarlo, ruotarlo o spegnerlo, e premi “Ricalcola la soluzione migliore”.",4]];
+  $("guide").innerHTML=G.map(function(g){return '<li class="'+(g[1]===stp?"now":(g[1]<stp?"done":""))+'"><b>'+(g[1]<stp?"✓":g[1])+'</b><span>'+g[0]+'</span></li>';}).join("");
+  $("northBox").hidden=!r.img;$("northR").value=r.north||0;$("northV").textContent=(r.north||0)+"°";
+  var sp=r.panels[RS.sel],pt=$("ptools");pt.hidden=!(drawn&&sp&&r.view!=="foto");
+  if(sp&&!pt.hidden){$("pOn").textContent=sp.off?"Accendi":"Spegni";var off=(Math.max(sp.w,sp.h)/2+0.5)*sc,ly=sp.y+off,above=ly/H>0.82;if(above)ly=sp.y-off-sc*1.6;
+    pt.style.left=Math.max(14,Math.min(86,sp.x/W*100))+"%";pt.style.top=Math.max(0,Math.min(92,ly/H*100))+"%";}
+  $("pAdd").hidden=!drawn;$("bSimRoof").hidden=!(drawn&&activePanels().length);$("battBox").hidden=$("bSimRoof").hidden;$("roofBattSel").value=String(V("roofBatt")||0);$("editHint").hidden=!drawn;
+  $("types").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",!r.multi&&b.dataset.type===r.type?"true":"false");});
+  $("multiLink").textContent=r.multi?"Torna al perimetro unico":"Il mio tetto ha più falde: le traccio una alla volta";
+  roofSummary();
+}
+function roofSummary(){
+  var r=RF(),ap=activePanels(),flat=r.type==="piano"&&!r.multi;if(!r.panels.length){$("roofSum").innerHTML="";return;}
+  var g={};ap.forEach(function(p){g[p.az]=(g[p.az]||0)+1;});var kwp=ap.length*PANEL_KW,f=roofFactor(ap),kwh=kwp*provYield()*f*OMBRE[S.ombre];
+  var pk=ap.length?peakTime(roofCurve("mezze",ap)):0,area=(r.multi?r.faces:[r.outline]).reduce(function(a,P){return a+areaPx(P);},0)/(r.scale*r.scale);
+  var M=[["Tetto",fN.format(area)+" m²"],["Pannelli accesi",ap.length+" su "+r.panels.length],["Potenza",fN1.format(kwp)+" kW"],["Produzione stimata",fN.format(kwh)+" kWh/anno"],["Picco di produzione",ap.length?"verso le "+hhmm(pk):"–"]];
+  $("roofSum").innerHTML=M.map(function(m){return '<div class="meter"><small>'+m[0]+'</small><b>'+m[1]+'</b></div>';}).join("")+(ap.length?'<div class="meter" style="grid-column:1/-1"><small>Esposizioni</small><b style="font-size:.95rem">'+Object.keys(g).map(function(a){return g[a]+" a "+dname(+a);}).join(", ")+'</b></div>':'');
+}
+/* interazioni */
+function svgPt(e){var sv=$("roof"),pt=sv.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;var m=sv.getScreenCTM();return m?pt.matrixTransform(m.inverse()):{x:0,y:0};}
+function roofChanged(){curveCache={};save();roofSVG();render();}
+function afterClose(){var r=RF(),F=frame();$("sideM").value=String(Math.round(F.L.len/r.scale*10)/10).replace(".",",");$("sideAsk").hidden=false;roofSVG();}
+function closeOutline(){var r=RF();if(r.multi){if(r.cur.length<3){toast("Servono almeno 3 angoli");return false;}r.faces.push(r.cur);r.cur=[];save();roofSVG();toast("Falda aggiunta: traccia la prossima o premi “Ho finito le falde”");return true;}if(r.outline.length<3){toast("Servono almeno 3 angoli");return false;}r.closed=true;save();afterClose();if($("sideAsk").scrollIntoView)$("sideAsk").scrollIntoView({behavior:reduceMotion()?"auto":"smooth",block:"center"});return true;}
+function finishRoof(){layout();S.roofOn=true;$("roofOn").checked=true;var best=optimize();if(best){RF().panels.forEach(function(p){p.off=best.list.indexOf(p)<0;});S.roofBatt=best.b;SIM.offer="T";}roofChanged();if(best)showOpt(best);}
+(function(){
+  $("roofOn").addEventListener("change",function(){S.roofOn=this.checked;if(S.roofOn&&activePanels().length)SIM.offer="T";roofChanged();});
+  var TY=[["lungo","Due falde","M8 44 L42 14 L76 44 Z M8 44 H76","M42 14 V44"],["corto","Due falde, colmo corto","M14 10 H70 V48 H14 Z","M42 10 V48"],["padiglione","A padiglione","M10 10 H74 V48 H10 Z","M10 10 L28 29 H56 L74 10 M10 48 L28 29 M56 29 L74 48"],["piano","Piano","M10 12 H74 V46 H10 Z",""]];
+  $("types").innerHTML=TY.map(function(t){return '<button type="button" data-type="'+t[0]+'" aria-pressed="false"><svg viewBox="0 0 84 56" aria-hidden="true"><path d="'+t[2]+'" fill="'+(t[0]==="piano"?"#C9CED3":"#DB7C5E")+'" stroke="#3D2A22" stroke-width="2.5" stroke-linejoin="round"/>'+(t[3]?'<path d="'+t[3]+'" stroke="#7A3424" stroke-width="2.5" fill="none"/>':'')+'</svg>'+t[1]+'</button>';}).join("");
+  $("types").querySelectorAll("button").forEach(function(b){b.addEventListener("click",function(){var r=RF();r.type=b.dataset.type;if(r.multi){r.multi=false;r.closed=r.outline.length>2;}if(r.closed)finishRoof();else roofChanged();});});
+  $("multiLink").addEventListener("click",function(e){e.preventDefault();var r=RF();r.multi=!r.multi;r.closed=false;r.panels=[];r.faces=[];r.cur=[];if(!r.multi)r.outline=[];$("sideAsk").hidden=true;$("optOut").innerHTML="";roofChanged();toast(r.multi?"Tocca gli angoli della prima falda":"Traccia il perimetro del tetto");});
+  $("rDone").addEventListener("click",function(){var r=RF();if(!r.faces.length)return;r.closed=true;save();afterClose();});
+  $("rDelFace").addEventListener("click",function(){var r=RF();r.faces.pop();r.closed=false;r.panels=[];roofChanged();});
+  $("rView").addEventListener("click",function(){var r=RF();r.view=r.view==="foto"?"disegno":"foto";save();roofSVG();});
+  $("rUndo").addEventListener("click",function(){var r=RF();(r.multi?r.cur:r.outline).pop();roofSVG();});
+  $("rClose").addEventListener("click",closeOutline);
+  $("rRedo").addEventListener("click",function(){var r=RF();r.outline=[];r.faces=[];r.cur=[];r.closed=false;r.panels=[];r.view="disegno";$("sideAsk").hidden=true;$("optOut").innerHTML="";roofChanged();});
+  $("roofImg").addEventListener("change",function(){var f=this.files&&this.files[0];this.value="";if(!f)return;var rd=new FileReader();rd.onload=function(){var im=new Image();im.onload=function(){var k=Math.min(1,1200/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+    var r=RF();r.img=c.toDataURL("image/jpeg",0.78);r.w=c.width;r.h=c.height;r.scale=c.width/40;r.panels=[];r.outline=[];r.faces=[];r.cur=[];r.closed=false;r.view="disegno";$("sideAsk").hidden=true;$("optOut").innerHTML="";roofChanged();toast("Tocca uno alla volta gli angoli del tuo tetto");};im.src=rd.result;};rd.readAsDataURL(f);});
+  var sv=$("roof");
+  sv.addEventListener("pointerdown",function(e){var p=svgPt(e),r=RF(),g=e.target.closest&&e.target.closest("[data-pi]");
+    if(r.closed&&e.target.closest&&e.target.closest("[data-rh]")){RS.rot={i:RS.sel};try{$("roof").setPointerCapture(e.pointerId);}catch(_){}return;}
+    if(r.closed){if(g&&r.view!=="foto"){var i=+g.dataset.pi,q=r.panels[i];RS.sel=i;RS.drag={i:i,dx:q.x-p.x,dy:q.y-p.y,x0:p.x,y0:p.y,moved:false};try{$("roof").setPointerCapture(e.pointerId);}catch(_){}roofSVG();}else if(!g){RS.sel=-1;roofSVG();}return;}
+    var arr=r.multi?r.cur:r.outline,f0=arr[0];if(f0&&arr.length>2&&Math.hypot(p.x-f0[0],p.y-f0[1])<r.w/20){closeOutline();return;}
+    arr.push([p.x,p.y]);roofSVG();});
+  $("roof").addEventListener("pointermove",function(e){if(RS.rot){var p0=svgPt(e),q0=RF().panels[RS.rot.i];if(!q0)return;var ang=Math.atan2(p0.y-q0.y,p0.x-q0.x)*180/Math.PI+90;q0.rot=Math.round(ang/5)*5;q0.az=panelAz(q0);curveCache={};roofSVG();return;}
+    if(!RS.drag)return;var p=svgPt(e),r=RF(),q=r.panels[RS.drag.i];if(!q)return;if(!RS.drag.moved&&Math.hypot(p.x-RS.drag.x0,p.y-RS.drag.y0)<r.scale*0.25)return;RS.drag.moved=true;q.x=p.x+RS.drag.dx;q.y=p.y+RS.drag.dy;q.az=panelAz(q);roofSVG();});
+  $("roof").addEventListener("pointerup",function(){if(RS.rot){RS.rot=null;roofChanged();return;}if(!RS.drag)return;var moved=RS.drag.moved;RS.drag=null;if(moved){S.roofOn=true;$("roofOn").checked=true;SIM.offer="T";roofChanged();}});
+  function selP(){return RF().panels[RS.sel];}
+  function rotP(d,abs){var q=selP();if(!q)return;q.rot=abs?d:((q.rot||0)+d);q.az=panelAz(q);roofChanged();}
+  $("pRm").addEventListener("click",function(){rotP(-15);});$("pRp").addEventListener("click",function(){rotP(15);});
+
+  $("pOn").addEventListener("click",function(){var q=selP();if(!q)return;q.off=!q.off;S.roofOn=true;$("roofOn").checked=true;SIM.offer="T";roofChanged();});
+  $("pDel").addEventListener("click",function(){var r=RF();if(r.panels[RS.sel]){r.panels.splice(RS.sel,1);RS.sel=-1;roofChanged();}});
+  $("pDesel").addEventListener("click",function(){RS.sel=-1;roofSVG();});
+  $("roofBattSel").addEventListener("change",function(){S.roofBatt=+this.value;save();render();});
+  $("bSimRoof").addEventListener("click",function(){RS.sel=-1;S.roofOn=true;$("roofOn").checked=true;SIM.offer="T";save();render();roofSVG();setStep("casa");$("simOffer").value="T";
+    if($("stage").scrollIntoView)$("stage").scrollIntoView({behavior:reduceMotion()?"auto":"smooth",block:"start"});SIM.t=360;$("tSlider").value=360;SIM.play=true;$("bPlay").textContent="❚❚";drawSim();toast("Simulo i "+activePanels().length+" pannelli che hai messo tu");});
+  $("pAdd").addEventListener("click",function(){var r=RF(),F=computeFaces();if(!F.length)return;var best=F.slice().sort(function(a,b){return yieldF(b.az,!!b.flat)-yieldF(a.az,!!a.flat);})[0],c=centroid(best.poly);
+    var q={x:c[0],y:c[1],az:best.az,off:false,w:PANEL_W,h:PANEL_H,rot:Math.atan2(best.u[1],best.u[0])*180/Math.PI};r.panels.push(q);RS.sel=r.panels.length-1;S.roofOn=true;$("roofOn").checked=true;SIM.offer="T";roofChanged();toast("Pannello aggiunto: trascinalo dove vuoi");});
+  document.querySelectorAll("[data-north]").forEach(function(b){b.addEventListener("click",function(){setNorth(+b.dataset.north);});});
+  $("northR").addEventListener("input",function(){setNorth(+this.value);});
+  function setNorth(n){var r=RF();r.north=n;r.panels.forEach(function(q){q.az=panelAz(q);});curveCache={};if(r.closed&&r.panels.length){save();roofSVG();render();}else roofChanged();}
+  $("sideOk").addEventListener("click",function(){var m=numDec($("sideM").value),r=RF();if(!(m>0)){toast("Scrivi la lunghezza in metri");return;}r.scale=frame().L.len/m;$("sideAsk").hidden=true;finishRoof();toast("Ecco il tuo tetto con i pannelli che convengono");});
+})();
+/* ---------- la soluzione migliore ---------- */
+function simDay(kw,batt,season,c,fo){
+  var dayE=kw*provYield()*fo*OMBRE[S.ombre]/365*SEASON[season].f,cap=batt*0.9,pmax=Math.max(1.5,batt*0.5),soc=cap*0.3,o={prod:0,self:0,exp:0,imp:0};
+  for(var m=0;m<1440;m++){var pv=c[m]*dayE*60,load=baseLoad(m)/0.62,d=Math.min(pv,load),sur=pv-d,def=load-d;
+    if(sur>0){var ch=Math.max(0,Math.min(sur,pmax,(cap-soc)*60/0.95));soc+=ch*0.95/60;o.exp+=(sur-ch)/60;}
+    if(def>0){var dis=Math.min(def,pmax,Math.max(0,soc-cap*0.1)*60);soc-=dis/60;d+=dis;o.imp+=(def-dis)/60;}
+    o.prod+=pv/60;o.self+=d/60;}
+  return o;
+}
+function annualOf(list,batt){var kw=list.length*PANEL_KW,fo=roofFactor(list),a={prod:0,self:0,exp:0,imp:0},W={estate:92,mezze:183,inverno:90};
+  Object.keys(W).forEach(function(se){var d=simDay(kw,batt,se,roofCurve(se,list),fo);["prod","self","exp","imp"].forEach(function(k){a[k]+=d[k]*W[se];});});return a;}
+function econ(R,kw,batt,a){
+  var eurKw=1600,noB=R.list.filter(function(o){return o.batt<=0&&o.kw>0;});if(noB.length)eurKw=Math.min.apply(null,noB.map(function(o){return o.price/o.kw;}));
+  var price=kw*eurKw+batt*1100,detrY=price*R.aliq/10,cum=-price,pay=null;
+  for(var t=1;t<=YEARS;t++){var dg=Math.pow(1-DEGR,t-1),b=a.self*dg*R.p*Math.pow(1+R.infl,t-1)+a.exp*dg*R.rid+(t<=10?detrY:0)-R.man-(t===R.invA?R.invC:0)-(batt>0&&t===R.batA?batt*R.batC:0);cum+=b;if(pay===null&&cum>=0)pay=t;}
+  return {price:price,net:cum,pay:pay,eurKw:eurKw};
+}
+function optimize(){
+  var R=window.__last,r=RF(),all=r.panels.slice();if(!all.length){toast("Traccia prima il perimetro del tetto");return null;}
+  var flat=r.type==="piano"&&!r.multi,byY=all.slice().sort(function(a,b){return yieldF(b.az,flat)-yieldF(a.az,flat);});
+  var groups={};byY.forEach(function(p){(groups[p.az]=groups[p.az]||[]).push(p);});var gk=Object.keys(groups).sort(function(a,b){return yieldF(+b,flat)-yieldF(+a,flat);}),rr=[],gi={};gk.forEach(function(k){gi[k]=0;});
+  while(rr.length<all.length){gk.forEach(function(k){if(gi[k]<groups[k].length)rr.push(groups[k][gi[k]++]);});}
+  var cands=[],maxB=V("cons")>0?Math.min(15,Math.ceil(V("cons")/365*0.6/5)*5+5):10;
+  [byY,rr].forEach(function(order,si){for(var n=Math.min(4,all.length);n<=all.length;n++){var list=order.slice(0,n);[0,5,10,15].forEach(function(b){if(b>maxB)return;var a=annualOf(list,b),e=econ(R,n*PANEL_KW,b,a);cands.push({n:n,list:list,b:b,a:a,e:e,s:si});});}});
+  var minPay=Math.min.apply(null,cands.map(function(c){return c.e.pay||99;}));
+  var ok=cands.filter(function(c){return (c.e.pay||99)<=minPay+1;}).sort(function(a,b){return b.e.net-a.e.net;});
+  return ok[0];
+}
+function tips(R,best){
+  var p=R.p,rid=R.rid,c=roofCurve("mezze",best.list),pk=peakTime(c),from=hhmm(Math.max(0,pk-120)),to=hhmm(Math.min(1439,pk+120)),cap=best.b*0.9,T=[];
+  T.push({e:220*1.35*(p-rid),t:"Lavatrice di giorno",p:"Falla partire tra le "+from+" e le "+to+", quando il tuo tetto produce di più"+(S.pres==="poca"?": usa il timer, anche se non sei in casa":"")+". Circa 220 lavaggi l’anno da 1,35 kWh."});
+  T.push({e:250*1.65*(p-rid),t:"Lavastoviglie dopo pranzo, non dopo cena",p:"Stesso principio: circa 250 cicli l’anno da 1,65 kWh, spostati nelle ore di sole."});
+  T.push({e:150*3.3*(p-rid)*0.6,t:"L’asciugatrice si mangia la batteria",p:"Un ciclo consuma circa 3,3 kWh"+(cap>0?", cioè il "+Math.round(Math.min(1,3.3/cap)*100)+"% della batteria da "+fN1.format(best.b)+" kWh: la sera la svuota e poi compri dalla rete":"")+". Se puoi, usala a metà giornata; d’estate meglio lo stendino."});
+  T.push({e:null,t:"Climatizzatore: rinfresca prima che arrivi il caldo",p:"D’estate accendilo nelle ore di sole e chiudi le tapparelle: la casa resta fresca anche dopo il tramonto, quando i pannelli si fermano."});
+  T.push({e:1500*0.15*(p-rid)*0.5,t:"Auto elettrica? Caricala con il sole",p:"Ogni 100 km servono circa 15 kWh: ricaricare a casa di giorno invece che la sera vale il risparmio indicato su 10.000 km l’anno, metà caricati col sole."});
+  T.push({e:null,t:"Il forno e l’induzione insieme",p:"Insieme arrivano a 4,5 kW: con un contatore da "+fN1.format(V("potImp")||3)+" kW la sera, senza sole, rischi che stacchi. Sfalsali di qualche minuto."});
+  return T;
+}
+function showOpt(pre){
+  var R=window.__last,best=pre||optimize();if(!best)return;var r=RF(),g={};best.list.forEach(function(p){g[p.az]=(g[p.az]||0)+1;});
+  var kw=best.n*PANEL_KW,a=best.a,e=best.e,cmp=R.list.map(function(o){var d=[];if(Math.abs(o.kw-kw)>0.8)d.push(o.kw>kw?"propone "+fN1.format(o.kw)+" kW, ne bastano "+fN1.format(kw):"propone "+fN1.format(o.kw)+" kW, il tuo tetto ne regge "+fN1.format(kw));if(o.batt!==best.b)d.push(o.batt>best.b?"batteria da "+fN1.format(o.batt)+" kWh, per le tue abitudini "+(best.b?"ne bastano "+best.b:"non serve"):(o.batt?"batteria da "+fN1.format(o.batt)+" kWh, ne servirebbero "+best.b:"senza batteria, con le tue abitudini ne servirebbero "+best.b+" kWh"));return d.length?'<li><b>'+esc(o.nome)+'</b>: '+esc(d.join("; "))+'.</li>':'<li><b>'+esc(o.nome)+'</b>: dimensionato come la soluzione migliore.</li>';});
+  var T=tips(R,best);
+  $("optOut").innerHTML='<div class="opt"><h3>La soluzione migliore per il tuo tetto e i tuoi consumi</h3><p style="margin:0"><b>'+best.n+' pannelli, '+fN1.format(kw)+' kW</b> ('+Object.keys(g).map(function(az){return g[az]+" a "+dname(+az);}).join(", ")+')'+(best.b?' con una <b>batteria da '+best.b+' kWh</b>':', <b>senza batteria</b>')+'. Produce circa '+fN.format(a.prod)+' kWh l’anno, ne usi in casa '+fN.format(a.self)+' ('+Math.round(a.self/(V("cons")||1)*100)+'% dei tuoi consumi coperti), ne mandi in rete '+fN.format(a.exp)+'. Con un prezzo stimato di '+eur(e.price)+' (circa '+eur(e.eurKw)+' per kW'+(best.b?' e 1.100 € per kWh di batteria':'')+') si ripaga in '+(e.pay?anni(e.pay):"oltre 25 anni")+' e lascia circa '+eur(e.net)+' in 25 anni.</p>'+
+    (r.panels.length>best.n?'<p class="note">Sul tetto ne starebbero '+r.panels.length+': gli altri '+(r.panels.length-best.n)+' renderebbero meno di quanto costano, li mostro trasparenti.</p>':'')+
+    (cmp.length?'<p style="margin:8px 0 0"><b>Confronto con i preventivi</b></p><ul style="margin:4px 0;padding-left:1.2em">'+cmp.join("")+'</ul>':'')+
+    '<div class="btnrow"><button type="button" class="btn main" id="bApply">Applica la soluzione consigliata e simula</button></div>'+
+    '<p style="margin:12px 0 0"><b>Cambia abitudini, guadagna di più</b></p><ul class="tips">'+T.map(function(x){return '<li><b>'+esc(x.t)+'</b><span class="eur">'+(x.e!=null?"+"+eur(x.e)+"/anno":"")+'</span><p>'+esc(x.p)+'</p></li>';}).join("")+'</ul>'+
+    calcBox("Per ogni combinazione di pannelli (prima i più redditizi, oppure alternando le esposizioni) e di batteria (0, 5, 10, 15 kWh) simulo tre giornate tipo (estate, mezze stagioni, inverno) con il tuo consumo e la tua presenza in casa, e le pesato sui giorni dell’anno. Poi calcolo 25 anni con le stesse ipotesi del collaudo. Scelgo la combinazione che lascia di più in 25 anni tra quelle che si ripagano al massimo un anno dopo la più rapida.")+'</div>';
+  $("bApply").addEventListener("click",function(){var ids=best.list;r.panels.forEach(function(p){p.off=ids.indexOf(p)<0;});S.roofBatt=best.b;S.roofOn=true;$("roofOn").checked=true;SIM.offer="T";roofChanged();setStep("casa");if($("stage").scrollIntoView)$("stage").scrollIntoView({behavior:reduceMotion()?"auto":"smooth",block:"center"});});
+}
+$("bOpt").addEventListener("click",function(){var rr=RF();if(rr.multi&&!rr.closed&&rr.faces.length){rr.closed=true;save();afterClose();return;}if(!rr.closed&&rr.outline.length>2){closeOutline();toast("Ho chiuso il perimetro: conferma la misura del lato giallo");return;}var b=$("bOpt");b.disabled=true;b.textContent="Calcolo…";setTimeout(function(){try{var best=optimize();if(best){RF().panels.forEach(function(p){p.off=best.list.indexOf(p)<0;});S.roofBatt=best.b;roofChanged();showOpt(best);}}finally{b.disabled=false;b.textContent="Ricalcola la soluzione migliore";}},30);});
+window.__optimize=optimize;window.__RF=RF;window.__roofChanged=roofChanged;window.__showOpt=showOpt;window.__finishRoof=finishRoof;
+
+/* ---------- lettura delle bollette della luce ---------- */
+function dDate(x){var m=/(\d{1,2})[\/.](\d{1,2})[\/.](\d{2,4})/.exec(x);if(!m)return null;var y=+m[3];if(y<100)y+=2000;return new Date(y,+m[2]-1,+m[1]);}
+function kwhNum(x){return itNum(String(x).replace(/\s/g,""));}
+function extractBill(t){
+  var lw=t.toLowerCase(),r={};
+  if(/smc|metri\s*cubi|gas\s*naturale/.test(lw)&&!/kwh/.test(lw)){r.gas=true;return r;}
+  var a=/consumo\s*annu[oa](?:\s*\([^)]{0,40}\))?[^0-9]{0,60}?(\d{1,3}(?:[.\s]\d{3})+|\d{3,5})\s*kwh/i.exec(t);if(a)r.annuo=kwhNum(a[1]);
+  var c=/(consum[oi]|energia)\s*(fatturat[aoi]|del\s*periodo|nel\s*periodo|rilevat[aoi]|totale|effettiv[oi])[^0-9]{0,50}?(\d{1,3}(?:[.\s]\d{3})+|\d{2,5})\s*kwh/i.exec(t);if(c)r.kwh=kwhNum(c[3]);
+  var pd=/(?:periodo|dal)[^0-9]{0,20}(\d{1,2}[\/.]\d{1,2}[\/.]\d{2,4})[^0-9]{1,8}(?:al|-|–)[^0-9]{0,6}(\d{1,2}[\/.]\d{1,2}[\/.]\d{2,4})/i.exec(t);
+  if(pd){var d1=dDate(pd[1]),d2=dDate(pd[2]);if(d1&&d2&&d2>d1)r.days=Math.round((d2-d1)/864e5)+1;}
+  var tt=/(totale\s*(?:da\s*pagare|bolletta|fattura|importo|della\s*bolletta)|importo\s*(?:totale|da\s*pagare))[^0-9]{0,40}?(?:€\s*)?(\d{1,3}(?:\.\d{3})*,\d{2})/i.exec(t);if(tt)r.tot=itNum(tt[2]);
+  ["F1","F2","F3"].forEach(function(f){var m=new RegExp("\\b"+f+"\\b[^0-9]{0,25}?(\\d{1,3}(?:[.\\s]\\d{3})+|\\d{1,5})\\s*kwh","i").exec(t);if(m)r[f]=kwhNum(m[1]);});
+  var pi=/potenza\s*impegnata[^0-9]{0,30}?(\d{1,2}(?:,\d{1,2})?)\s*kw/i.exec(t);if(pi)r.pot=itNum(pi[1]);
+  return r;
+}
+window.__extractBill=extractBill;
+function applyBills(list){
+  var bills=list.filter(function(b){return b.r&&!b.r.gas;}),gas=list.filter(function(b){return b.r&&b.r.gas;}).length,got=[];
+  if(!bills.length){$("billFound").innerHTML="<b>Nessuna bolletta della luce letta.</b>"+(gas?" Ho scartato "+gas+" bollett"+(gas>1?"e":"a")+" del gas.":" Se sono scansioni, non contengono testo: inserisci i dati a mano.");S.billFound=$("billFound").innerHTML;save();return;}
+  var annuo=Math.max.apply(null,bills.map(function(b){return b.r.annuo||0;})),kwh=0,tot=0,days=0,f={F1:0,F2:0,F3:0},pot=0;
+  bills.forEach(function(b){var r=b.r;if(r.kwh&&r.tot){kwh+=r.kwh;tot+=r.tot;}if(r.kwh&&r.days)days+=r.days;["F1","F2","F3"].forEach(function(x){f[x]+=r[x]||0;});if(r.pot)pot=Math.max(pot,r.pot);});
+  if(annuo>200){S.cons=Math.round(annuo);got.push("consumo annuo "+fN.format(annuo)+" kWh (dalla bolletta)");}
+  else if(kwh>0&&days>20){var stim=Math.round(kwh/days*365/10)*10;S.cons=stim;got.push("consumo annuo stimato "+fN.format(stim)+" kWh ("+fN.format(kwh)+" kWh in "+days+" giorni)");}
+  if(kwh>0&&tot>0){var pr=tot/kwh;if(pr>0.1&&pr<0.8){S.prezzo=Math.round(pr*100)/100;got.push("prezzo reale "+eur2(pr)+" al kWh ("+eur2(tot)+" diviso "+fN.format(kwh)+" kWh, tasse e oneri compresi)");}}
+  var ft=f.F1+f.F2+f.F3;if(ft>0&&f.F1>0){var sh=f.F1/ft;S.f1share=Math.round(sh*100);S.pres=sh<0.34?"poca":(sh<0.42?"media":"molta");got.push("fascia F1 (feriali 8–19) "+Math.round(sh*100)+"% dei consumi: presenza di giorno “"+({poca:"quasi mai",media:"a volte",molta:"quasi sempre"})[S.pres]+"”");}
+  if(pot>0){S.potImp=pot;got.push("potenza del contatore "+fN1.format(pot)+" kW");}
+  $("billFound").innerHTML='<b>Dalle bollette ('+bills.length+')</b>'+(got.length?'<ul>'+got.map(function(g){return '<li>'+esc(g)+'</li>';}).join("")+'</ul>':'<div>Non ho trovato dati utili: le bollette sono scritte in modi diversi, inseriscili a mano.</div>')+(gas?'<div>'+(gas>1?'Scartate '+gas+' bollette':'Scartata 1 bolletta')+' del gas.</div>':'')+'<div>Controlla i valori. Per il consumo annuo vale il dato “ultimi 12 mesi”, se c’è.</div>';
+  S.billFound=$("billFound").innerHTML;
+}
+function handleBills(files){
+  var list=[].slice.call(files).filter(function(f){return /pdf$/i.test(f.type)||/\.pdf$/i.test(f.name);}).slice(0,12);
+  if(!list.length){$("billFound").textContent="Serve un file PDF.";return;}
+  $("billFound").textContent="Leggo "+(list.length===1?"la bolletta":list.length+" bollette")+"…";
+  Promise.all(list.map(function(f){return readPdf(f).then(function(t){return {f:f,r:t&&t.replace(/\s/g,"").length>40?extractBill(t):null};},function(){return {f:f,r:null};});})).then(function(out){
+    applyBills(out);curveCache={};fill();save();render();toast("Bollette lette: controlla i dati della casa");});
+}
+(function(){var d=$("dropB"),inp=$("billIn");
+  d.addEventListener("click",function(){inp.click();});
+  d.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();inp.click();}});
+  inp.addEventListener("change",function(){handleBills(inp.files);inp.value="";});
+  ["dragenter","dragover"].forEach(function(ev){d.addEventListener(ev,function(e){e.preventDefault();d.classList.add("over");});});
+  ["dragleave","drop"].forEach(function(ev){d.addEventListener(ev,function(e){e.preventDefault();d.classList.remove("over");});});
+  d.addEventListener("drop",function(e){if(e.dataTransfer&&e.dataTransfer.files)handleBills(e.dataTransfer.files);});
+})();
+window.__applyBillText=function(texts){applyBills(texts.map(function(t,i){return {f:{name:"b"+i},r:extractBill(t)};}));curveCache={};fill();save();render();};
+
+/* ---------- eventi ---------- */
+var tmr;
+$("form").addEventListener("input",function(e){if(!e.target.dataset.k)return;readField(e.target);clearTimeout(tmr);tmr=setTimeout(function(){save();render();},180);});
+$("form").addEventListener("change",function(e){if(!e.target.dataset.k)return;readField(e.target);save();curveCache={};render();if(e.target.id==="prov"){mapSVG();setStep("italia");setTimeout(function(){setStep("prov");},reduceMotion()?0:350);}});
+document.querySelectorAll(".levels button").forEach(function(b){b.addEventListener("click",function(){setLv(b.dataset.lv);save();render();});});
+document.querySelectorAll(".steps button").forEach(function(b){b.addEventListener("click",function(){setStep(b.dataset.step);});});
+document.querySelectorAll(".mode button").forEach(function(b){b.addEventListener("click",function(){SIM.mode=b.dataset.mode;document.querySelectorAll(".mode button").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});drawSim();});});
+$("tSlider").addEventListener("input",function(){SIM.t=+this.value;drawSim();});
+$("season").addEventListener("change",function(){SIM.season=this.value;drawSim();});
+$("simOffer").addEventListener("change",function(){SIM.offer=this.value;drawSim();});
+$("bPlay").addEventListener("click",function(){SIM.play=!SIM.play;if(SIM.play&&SIM.t>=1439)SIM.t=0;this.textContent=SIM.play?"❚❚":"▶";this.setAttribute("aria-label",SIM.play?"Ferma la giornata":"Avvia la giornata");if(SIM.play&&(SIM.step==="italia"||SIM.step==="prov"))setStep("casa");});
+$("apps").innerHTML=APPS.map(function(a){return '<button type="button" class="app" data-app="'+a.k+'" aria-pressed="false"><span><span class="nm">'+esc(a.n)+'</span><span class="kw"></span></span><span class="sw" aria-hidden="true"></span></button>';}).join("");
+$("apps").querySelectorAll(".app").forEach(function(b){b.addEventListener("click",function(){var k=b.dataset.app;if(SIM.apps[k]!=null)delete SIM.apps[k];else SIM.apps[k]=Math.round(SIM.t);if(SIM.step==="italia"||SIM.step==="prov")setStep("casa");drawSim();});});
+$("bReset").addEventListener("click",function(){var lv=S.lv;S=JSON.parse(JSON.stringify(DEF));S.lv=lv;$("pdfMsg").textContent="";$("optOut").innerHTML="";SIM.apps={};curveCache={};fill();$("roofOn").checked=false;save();render();roofSVG();toast("Valori di esempio ripristinati");});
+$("bNew").addEventListener("click",function(){
+  if(!window.confirm("Cancello i preventivi inseriti e i PDF letti? I dati della tua casa restano."))return;
+  KEYS.forEach(function(k){["_nome","_prezzo","_kw","_batt","_prom","_autoV","_battC","_rata","_mesi"].forEach(function(x){S[k+x]="";});S[k+"_on"]=k==="A";S[k+"_fin"]=false;S[k+"_promT"]="anni";S[k+"_garInv"]=10;S[k+"_ass"]=0;S[k+"_cl"]=[];S[k+"_found"]="";});
+  SIM.apps={};$("pdfMsg").textContent="";fill();save();render();window.scrollTo({top:0,behavior:"smooth"});toast("Pronto per una nuova valutazione");
+});
+$("bCopy").addEventListener("click",function(){
+  var t="Il Collaudo del mio fotovoltaico\n"+$("big").innerText+"\n"+$("verdict").textContent+"\n"+$("verdict2").textContent;
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast("Verbale copiato");},function(){toast("Copia non riuscita: seleziona il testo a mano");});}
+  else toast("Copia non disponibile in questo browser");
+});
+function toast(m){var t=$("toast");t.textContent=m;t.classList.add("on");setTimeout(function(){t.classList.remove("on");},1800);}
+
+/* ---------- PDF ---------- */
+var JSPDF_URL="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+var dlP=(window.claude&&typeof window.claude.use==="function")?window.claude.use("downloads").catch(function(){return null;}):Promise.resolve(null);
+function loadJsPDF(){return new Promise(function(res,rej){if(window.jspdf&&window.jspdf.jsPDF)return res();var s=document.createElement("script");s.src=JSPDF_URL;s.onload=function(){res();};s.onerror=function(){rej(new Error("load"));};document.head.appendChild(s);});}
+function txt(el){return (el?el.textContent:"").replace(/\s+/g," ").replace(/−/g,"-").replace(/–/g,"-").replace(/←/g,"<-").replace(/→/g,"->").replace(/[^\x00-\u00FF’“”€…]/g,"").trim();}
+function svgPng(svgInner,vb,w,h){return new Promise(function(res){setTimeout(function(){res(null);},3000);try{var svg='<svg xmlns="'+NS+'" viewBox="'+vb+'" width="'+w+'" height="'+h+'">'+svgInner.replace(/var\(--[a-z-]+\)/g,"#5A6B7B")+'</svg>',img=new Image();img.onload=function(){try{var c=document.createElement("canvas");c.width=w;c.height=h;var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,w,h);x.drawImage(img,0,0,w,h);res(c.toDataURL("image/jpeg",0.9));}catch(e){res(null);}};img.onerror=function(){res(null);};img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);}catch(e){res(null);}});}
+function buildPdf(){
+  var R=window.__last,L=R.list,jsPDF=window.jspdf.jsPDF,doc=new jsPDF({unit:"mm",format:"a4"});
+  var K={ink:[14,42,64],muted:[90,107,123],red:[217,70,59]},PW=210,PH=297,M=14,W=PW-2*M,y=M;
+  function LH(s){return s*0.3528*1.3;}
+  function F(s,st,c){doc.setFont("helvetica",st||"normal");doc.setFontSize(s);doc.setTextColor(c[0],c[1],c[2]);}
+  function brk(h){if(y+h>PH-M-8){doc.addPage();y=M;}}
+  function para(t,o){o=o||{};if(!t)return;var s=o.size||9;F(s,o.style,o.color||K.ink);doc.splitTextToSize(t,W).forEach(function(l){brk(LH(s));doc.text(l,M,y+LH(s)*0.78);y+=LH(s);});y+=(o.after==null?1.5:o.after);}
+  function head(t){brk(14);y+=2;F(13,"bold",K.ink);doc.text(t,M,y+4);y+=7;doc.setDrawColor(245,158,11);doc.setLineWidth(0.7);doc.line(M,y,M+30,y);y+=3;}
+  var o=simOffer(R),T=Math.round(SIM.t),r=simulate(R,o,T);
+  return Promise.all([svgPng(houseSVG(R,o,r,T),"0 0 1000 700",1000,700),svgPng(schemaSVG(R,o,r,T),"0 0 1000 700",1000,700)]).then(function(pics){
+    F(22,"bold",K.ink);doc.text("Il Collaudo del Fotovoltaico",M,y+8);y+=12;
+    F(9,"normal",K.muted);doc.text("Generato il "+new Date().toLocaleDateString("it-IT")+". "+provObj().n+". Informazioni aggiornate a "+AGG.label+".",M,y+3);y+=7;
+    para(txt(document.querySelector(".legalnote")).replace(" Leggi le avvertenze legali."," Avvertenze legali complete in fondo."),{size:7.5,style:"italic",color:K.muted,after:3});
+    para(txt($("big")),{size:11,style:"bold"});
+    head("La giornata simulata: "+(o?o.nome:"")+" alle "+hhmm(T));
+    var iw=(W-6)/2,ih=iw*0.7;brk(ih+6);if(pics[0])doc.addImage(pics[0],"JPEG",M,y,iw,ih);if(pics[1])doc.addImage(pics[1],"JPEG",M+iw+6,y,iw,ih);y+=ih+3;
+    para("Fino alle "+hhmm(T)+": prodotti "+fN1.format(r.prod)+" kWh, usati in casa "+fN1.format(r.self)+", regalati alla rete "+fN1.format(r.exp)+", comprati dalla rete "+fN1.format(r.imp)+", risparmio "+eur2(r.save)+". Stagione: "+$("season").selectedOptions[0].textContent.toLowerCase()+". "+(SIM.mode==="promessa"?"Modalita Promessa.":"Simulazione realistica."),{size:8.5,color:K.muted});
+    L.forEach(function(o){head(o.nome+(o.filtro===null?"":": Indice di Fuffa "+Math.round(o.filtro*100)+"%"));
+      para(eur(o.price)+", "+fN1.format(o.kw)+" kW"+(o.batt>0?" + batteria "+fN1.format(o.batt)+" kWh":"")+". Rientro promesso "+(isNaN(o.promY)?"non indicato":anni(Math.ceil(o.promY)))+", al collaudo "+(o.pay?anni(o.pay):"oltre 25 anni")+". Autoconsumo reale "+fN.format(o.autoPct)+"%. Risparmio netto in 25 anni "+eur(o.net)+". "+verdOf(o.filtro).t+".",{size:9.5,style:"bold"});
+      ritocchi(R,o).forEach(function(x){para((x.cl?"Dal PDF - ":"")+x.t+(x.e!=null?": "+eur(x.e):"")+". "+x.p+(x.q?" Nel PDF: \""+x.q+"\"":""),{size:8.5,after:1});});});
+    head("Chi ha gonfiato di più");
+    var tb=document.querySelector("#rank table"),rows=[].map.call(tb.querySelectorAll("tr"),function(tr){return [].map.call(tr.children,function(td){return txt(td);});});
+    var nc=rows[0].length,w0=W*0.32,wi=(W-w0)/(nc-1);
+    rows.forEach(function(rr,ri){var cells=rr.map(function(t,ci){return doc.splitTextToSize(t,(ci?wi:w0)-2);}),rh=Math.max.apply(null,cells.map(function(c){return c.length;}))*LH(8)+1.4;brk(rh);
+      rr.forEach(function(t,ci){F(8,(ri===0||ci===0)?"bold":"normal",K.ink);var cx=ci===0?M:M+w0+wi*ci-0.5;cells[ci].forEach(function(l,li){doc.text(l,cx,y+0.7+LH(8)*(li+0.78),ci===0?{}:{align:"right"});});});
+      y+=rh;doc.setDrawColor(213,223,232);doc.setLineWidth(0.2);doc.line(M,y-0.3,M+W,y-0.3);});
+    y+=2;para(txt($("rankNote")),{size:7.5,style:"italic",color:K.muted});
+    head("Prima di firmare: le domande da fare");[].forEach.call($("sAsk").querySelectorAll("li"),function(e,i){para((i+1)+". "+txt(e),{size:8.5,after:1});});
+    head("Le ipotesi del calcolo");[].forEach.call($("sDice").querySelectorAll("li"),function(e){para(txt(e),{size:8.5,after:1});});
+    head("Il verbale di collaudo");para(txt($("verdict")),{size:12,style:"bold"});para(txt($("verdict2")),{size:8.5,color:K.muted});
+    var lg=document.querySelector(".legal");head(txt(lg.querySelector("h2")));[].forEach.call(lg.querySelectorAll("p,li"),function(e){para(txt(e),{size:7,style:e.classList.contains("stamp")?"bold":"normal",after:0.8});});
+    [].forEach.call(document.querySelectorAll(".foot > p"),function(p){para(txt(p),{size:7,color:K.muted,after:0.6});});
+    para("Il libro: amazon.it/dp/B0HL52X9VB. Capitolo 1 gratis: fuffalibrary.lemonsqueezy.com",{size:7,color:[45,127,249]});
+    var np=doc.getNumberOfPages();for(var pg=1;pg<=np;pg++){doc.setPage(pg);F(7,"normal",K.muted);doc.text("Il Collaudo del Fotovoltaico, informazioni aggiornate a "+AGG.label+". Non sostituisce un tecnico abilitato.",M,PH-8);doc.text("Pagina "+pg+" di "+np,PW-M,PH-8,{align:"right"});}
+    return doc;
+  });
+}
+window.__buildPdf=buildPdf;window.__sim=function(t){SIM.t=t;drawSim();return lastSim;};window.__SIM=SIM;
+function pdfName(){var d=new Date();return "collaudo-fotovoltaico-"+d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")+".pdf";}
+$("bPrint").addEventListener("click",function(){
+  var btn=$("bPrint");btn.disabled=true;var old=btn.textContent;btn.textContent="Preparo il PDF…";
+  loadJsPDF().then(buildPdf).then(function(doc){var name=pdfName();
+    return dlP.then(function(dl){if(dl){return dl.save({filename:name,data:doc.output("blob")}).then(function(){toast("PDF pronto");},function(e){toast(e&&e.code==="declined"?"Download annullato":"Download non disponibile qui");});}doc.save(name);toast("PDF pronto");});
+  }).catch(function(){toast("Non riesco a creare il PDF: apro la stampa");window.print();}).then(function(){btn.disabled=false;btn.textContent=old;});
+});
+
+fill();$("roofOn").checked=!!S.roofOn;mapSVG();render();roofSVG();setMapView("italia",false);requestAnimationFrame(tick);
+setTimeout(fly,reduceMotion()?0:700);
+})();
+</script>
+</body>
+</html>
